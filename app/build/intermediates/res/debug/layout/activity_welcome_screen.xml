@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/welcome_background">
+
+    <Assets.TextViewGrandHotel
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textColor="@color/welcome_text" android:textSize="100sp"
+        android:id="@+id/tvWelcomeMessage" android:text="@string/app_name"
+        android:layout_marginTop="164sp" android:layout_centerHorizontal="true"/>
+
+</RelativeLayout><!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/layout/activity_welcome_screen.xml -->

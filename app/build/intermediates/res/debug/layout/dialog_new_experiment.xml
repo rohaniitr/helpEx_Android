@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent" android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+            android:id="@+id/rlToolbar" android:background="@color/custom_dialog_divider"
+            android:paddingRight="24sp" android:paddingLeft="16sp"
+            android:layout_marginBottom="16sp">
+
+            <ImageView
+                android:layout_width="30sp" android:layout_height="30sp"
+                android:id="@+id/ivBack" android:background="@drawable/abc_ic_ab_back_mtrl_am_alpha"
+                android:tint="#eeeeee" android:layout_centerVertical="true"/>
+
+            <Assets.TextViewGrandHotel
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Create New Experiment" android:textColor="#dddddd"
+                android:textSize="32sp" android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/ivBack" android:layout_marginLeft="16sp"/>
+
+        </RelativeLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="fill_parent" android:layout_height="wrap_content"
+            android:id="@+id/tilExperimentTitle" android:layout_below="@id/rlToolbar"
+            android:layout_marginBottom="24sp" android:layout_marginLeft="24sp"
+            android:layout_marginRight="24sp">
+            <EditText
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="Experiment Title *" android:id="@+id/etExperimentTitle"
+                android:inputType="textCapWords" android:focusable="true"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="fill_parent" android:layout_height="wrap_content"
+            android:id="@+id/tilExperimentSubject" android:layout_below="@id/tilExperimentTitle"
+            android:layout_marginBottom="24sp" android:layout_marginLeft="24sp"
+            android:layout_marginRight="24sp">
+            <EditText
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="Subject" android:id="@+id/etExperimentSubject"
+                android:inputType="textCapWords"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:layout_width="match_parent" android:layout_height="58sp"
+            android:textColor="#eeeeee" android:background="@color/custom_dialog_button_background"
+            android:layout_centerHorizontal="true" android:text="Continue"
+            android:layout_marginTop="14sp"
+            android:id="@+id/bNewColumns" android:layout_below="@id/tilExperimentSubject"/>
+
+    </RelativeLayout>
+</ScrollView><!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/layout/dialog_new_experiment.xml -->

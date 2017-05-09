@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:paddingTop="16sp" android:paddingLeft="10sp"
+    android:paddingRight="10sp" android:background="@color/custom_primary_color"
+    android:id="@+id/rlElementHome">
+
+    <ImageView
+        android:layout_width="30sp" android:layout_height="30sp"
+        android:id="@+id/ivNewExperiment" android:layout_alignParentRight="true"
+        android:layout_marginRight="16sp" android:layout_marginLeft="16sp"
+        android:tint="#448844" />
+
+    <Assets.TextViewCaviarDreams
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textSize="20sp" android:layout_marginBottom="6sp"
+        android:textColor="#666666" android:id="@+id/tvTitle"
+        android:layout_toLeftOf="@id/ivNewExperiment" android:layout_alignParentLeft="true"/>
+
+    <Assets.TextViewCaviarDreams
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:id="@+id/tvSubject" android:textSize="14sp"
+        android:layout_below="@id/tvTitle" android:layout_toLeftOf="@id/ivNewExperiment"
+        android:layout_alignParentLeft="true" android:textColor="#888888"/>
+
+    <Assets.TextViewCaviarDreams
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:id="@+id/tvDateAndTime" android:textSize="14sp"
+        android:layout_below="@id/tvSubject" android:layout_toLeftOf="@id/ivNewExperiment"
+        android:layout_alignParentLeft="true" android:textColor="#888888"/>
+
+    <ImageView
+        android:layout_width="match_parent" android:layout_height="1sp"
+        android:background="#f0444477" android:layout_below="@id/tvDateAndTime"
+        android:layout_marginTop="16sp"/>
+
+</RelativeLayout>
