@@ -2,6 +2,7 @@ package com.rohansarkar.helpex.Activities;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -11,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -20,6 +20,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -29,7 +30,10 @@ import com.rohansarkar.helpex.CustomData.DataExperiment;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
 import com.rohansarkar.helpex.R;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import Assets.Util;
 
@@ -41,7 +45,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
     RecyclerView.LayoutManager layoutManager;
     CoordinatorLayout layout;
     Toolbar toolbar;
-    ImageView newExperiment;
+    ImageView overflowMenu;
     ImageView favourites;
 
     ArrayList<DataExperiment> experiments;
@@ -109,17 +113,29 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        newExperiment = (ImageView) findViewById(R.id.ivNewExperiment);
+        overflowMenu = (ImageView) findViewById(R.id.ivOverflowMenu);
         favourites = (ImageView) findViewById(R.id.ivFavourites);
-        newExperiment.setOnClickListener(this);
+        overflowMenu.setOnClickListener(this);
         favourites.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch(view.getId()){
-            case R.id.ivNewExperiment:
-                launchNewExperimentDialog();
+            case R.id.ivOverflowMenu:
+                //Inflate and Show Toolbar popup.
+                PopupMenu toolbarMenu = new PopupMenu(this, overflowMenu);
+                toolbarMenu.getMenuInflater().inflate(R.menu.popup_home_toolbar, toolbarMenu.getMenu());
+                toolbarMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        if(menuItem.getItemId() == R.id.popup_add_experiment){
+                            launchNewExperimentDialog();
+                        }
+                        return false;
+                    }
+                });
+                toolbarMenu.show();
                 break;
 
             case R.id.ivFavourites:
@@ -156,7 +172,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
 
     private void launchNewExperimentDialog(){
         final Dialog dialog= new Dialog(this);
-//        dialog.getWindow().getAttributes().windowAnimations= R.style.CustomLeftDialogAnimation;
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_new_experiment);
 
@@ -172,10 +187,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
         Button createNewColumns = (Button) dialog.findViewById(R.id.bNewColumns);
         ImageView back = (ImageView) dialog.findViewById(R.id.ivBack);
 
-        //Open Keyboard.
         title.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(title, InputMethodManager.SHOW_IMPLICIT);
+        showKeyboard();
 
         //Button Listener here.
         View.OnClickListener createNewExperimentListener= new View.OnClickListener() {
@@ -183,22 +196,43 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
             public void onClick(View view) {
                 if(title.getText().toString().trim().length()>0){
 
-                    if(subject.getText().toString().trim().length()>0)
-                        launchNewColumnDialog(title.getText().toString(), subject.getText().toString());
-                    else
-                        launchNewColumnDialog(title.getText().toString(), "");
+                    DataExperiment data = new DataExperiment();
+                    data.title = title.getText().toString();
+                    data.starType = Util.StarType.NOT_STARRED;
+                    data.subject = subject.getText().toString();
+
+                    //Get current Date & Time.
+                    DateFormat dfDate = new SimpleDateFormat("yyyy/mm/dd");
+                    DateFormat dfTime = new SimpleDateFormat("hh:mm aaa");
+                    data.date=dfDate.format(Calendar.getInstance().getTime());
+                    data.time = dfTime.format(Calendar.getInstance().getTime());
+
+                    //Add new experiment to db.
+                    data.experimentID = detailsManager.createEntry(data);
+
+                    //Add new experiment to the list.
+                    experiments.add(data);
+                    setRecyclerView(experiments);
+                    //Scroll to the newly added experiment.
+                    recyclerView.scrollToPosition(experiments.size()-1);
 
                     dialog.dismiss();
                 }
             }
         };
-
         View.OnClickListener backListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
             }
         };
+
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                hideKeyboard();
+            }
+        });
 
         //Buttons here.
         createNewColumns.setOnClickListener(createNewExperimentListener);
@@ -293,5 +327,15 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
 
     private void showToast(String message){
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    //APIs for Soft Keyboard.
+    private void showKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+    }
+    private void hideKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
     }
 }

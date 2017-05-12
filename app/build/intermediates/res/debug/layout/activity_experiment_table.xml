@@ -1,0 +1,43 @@
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent" android:layout_width="match_parent"
+    android:id="@+id/clHome" android:nestedScrollingEnabled="true">
+
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="vertical" android:layout_gravity="top">
+
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+            android:id="@+id/tbHome" android:background="@color/custom_primary_color"
+            android:backgroundTint="@color/custom_dialog_divider" app:layout_collapseMode="pin"
+            android:elevation="20sp">
+
+            <RelativeLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:paddingRight="16sp">
+
+                <Assets.TextViewGrandHotel
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:id="@+id/tvToolbarTitle" android:textColor="#dddddd"
+                    android:textSize="32sp" android:layout_centerVertical="true"/>
+
+                <ImageView
+                    android:layout_width="30sp" android:layout_height="30sp"
+                    android:background="@drawable/icon_more_vert"
+                    android:backgroundTint="#dddddd" android:layout_alignParentRight="true"
+                    android:id="@+id/ivOverflowMenu" android:layout_centerVertical="true"/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.Toolbar>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvHome" android:scrollbars="vertical"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:nestedScrollingEnabled="true"/>
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout><!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/layout/activity_experiment_table.xml -->

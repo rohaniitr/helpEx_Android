@@ -43,7 +43,6 @@ public class NewColumnAdapter extends RecyclerView.Adapter<NewColumnAdapter.View
     }
 
     public NewColumnAdapter(ArrayList<String> columnNames, Context context, RelativeLayout layout,RecyclerView recyclerView){
-        showToast("Constructor");
         this.columnNames= columnNames;
         this.layout= layout;
         this.context= context;
@@ -52,7 +51,6 @@ public class NewColumnAdapter extends RecyclerView.Adapter<NewColumnAdapter.View
 
     @Override
     public NewColumnAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        showToast("onCreateViewHolder");
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.element_new_column, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
@@ -60,7 +58,6 @@ public class NewColumnAdapter extends RecyclerView.Adapter<NewColumnAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        showToast("onBindViewHolder");
         holder.columnName.setText((position+1) + ". " + columnNames.get(position));
         holder.remove.setOnClickListener(new View.OnClickListener() {
             @Override

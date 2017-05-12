@@ -7,26 +7,33 @@
 
     <ImageView
         android:layout_width="30sp" android:layout_height="30sp"
-        android:id="@+id/ivNewExperiment" android:layout_alignParentRight="true"
-        android:layout_marginRight="16sp" android:layout_marginLeft="16sp"
+        android:id="@+id/ivOverflowMenu" android:layout_alignParentRight="true"
+        android:layout_marginRight="8sp" android:layout_marginLeft="8sp"
+        android:backgroundTint="#448844" android:background="@drawable/icon_more_vert"/>
+
+    <!--46sp = 8+30+8-->
+    <ImageView
+        android:layout_width="30sp" android:layout_height="30sp"
+        android:id="@+id/ivStar" android:layout_alignParentRight="true"
+        android:layout_marginLeft="16sp" android:layout_marginRight="46sp"
         android:tint="#448844" />
 
     <Assets.TextViewCaviarDreams
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:textSize="20sp" android:layout_marginBottom="6sp"
         android:textColor="#666666" android:id="@+id/tvTitle"
-        android:layout_toLeftOf="@id/ivNewExperiment" android:layout_alignParentLeft="true"/>
+        android:layout_toLeftOf="@id/ivStar" android:layout_alignParentLeft="true"/>
 
     <Assets.TextViewCaviarDreams
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:id="@+id/tvSubject" android:textSize="14sp"
-        android:layout_below="@id/tvTitle" android:layout_toLeftOf="@id/ivNewExperiment"
+        android:layout_below="@id/tvTitle" android:layout_toLeftOf="@id/ivStar"
         android:layout_alignParentLeft="true" android:textColor="#888888"/>
 
     <Assets.TextViewCaviarDreams
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:id="@+id/tvDateAndTime" android:textSize="14sp"
-        android:layout_below="@id/tvSubject" android:layout_toLeftOf="@id/ivNewExperiment"
+        android:layout_below="@id/tvSubject" android:layout_toLeftOf="@id/ivStar"
         android:layout_alignParentLeft="true" android:textColor="#888888"/>
 
     <ImageView

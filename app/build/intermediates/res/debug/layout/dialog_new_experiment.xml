@@ -33,7 +33,7 @@
             <EditText
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:hint="Experiment Title *" android:id="@+id/etExperimentTitle"
-                android:inputType="textCapWords" android:focusable="true"/>
+                android:inputType="textCapWords" android:focusableInTouchMode="true"/>
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -50,7 +50,7 @@
         <Button
             android:layout_width="match_parent" android:layout_height="58sp"
             android:textColor="#eeeeee" android:background="@color/custom_dialog_button_background"
-            android:layout_centerHorizontal="true" android:text="Continue"
+            android:layout_centerHorizontal="true" android:text="Done"
             android:layout_marginTop="14sp"
             android:id="@+id/bNewColumns" android:layout_below="@id/tilExperimentSubject"/>
 

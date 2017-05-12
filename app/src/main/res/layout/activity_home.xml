@@ -25,14 +25,14 @@
 
                 <ImageView
                     android:layout_width="30sp" android:layout_height="30sp"
-                    android:background="@drawable/icon_add_white"
+                    android:background="@drawable/icon_more_vert"
                     android:backgroundTint="#dddddd" android:layout_alignParentRight="true"
-                    android:id="@+id/ivNewExperiment" android:layout_centerVertical="true"/>
+                    android:id="@+id/ivOverflowMenu" android:layout_centerVertical="true"/>
 
                 <ImageView
                     android:layout_width="30sp" android:layout_height="30sp"
                     android:background="@drawable/star_solid" android:layout_marginRight="8sp"
-                    android:backgroundTint="#dddddd" android:layout_toLeftOf="@id/ivNewExperiment"
+                    android:backgroundTint="#dddddd" android:layout_toLeftOf="@id/ivOverflowMenu"
                     android:id="@+id/ivFavourites" android:layout_centerVertical="true"/>
 
             </RelativeLayout>

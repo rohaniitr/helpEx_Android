@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/popup_add_columns" android:title="Add Columns"/>
+
+    <item android:id="@+id/popup_plot_graph" android:title="Plot Graph"/>
+
+    <item android:id="@+id/popup_export_details" android:title="Export Details"/>
+
+</menu><!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/menu/popup_experiment_table.xml -->

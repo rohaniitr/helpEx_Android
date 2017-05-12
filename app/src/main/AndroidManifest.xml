@@ -20,6 +20,9 @@
         <activity
             android:name=".Activities.Home" android:label="@string/app_name" />
 
+        <activity
+            android:name=".Activities.ExperimentTable" android:label="@string/app_name" />
+
     </application>
 
 </manifest>
