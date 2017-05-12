@@ -10,3 +10,5 @@ The functionalities in the app are:
 5. Export data in different formats - pdfs, excel, etc.
 6. Zoom in or Zoom out the table.
 7. Dynamically add/remove columns.
+
+![alt text](Extras/splash_screen.jpg)
