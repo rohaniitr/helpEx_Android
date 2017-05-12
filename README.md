@@ -11,4 +11,4 @@ The functionalities in the app are:
 6. Zoom in or Zoom out the table.
 7. Dynamically add/remove columns.
 
-<img src="Extras/splash_screen.jpg" width="320" height="550">
+<center><img src="Extras/splash_screen.jpg" width="320" height="550"></center>
