@@ -1,5 +1,7 @@
 ## helpEx for Android
 
+<img src="Extras/splash_screen.jpg" width="320" height="550" align="middle">
+
 This project is an Android application for assisting students in recording their Experimental Data, usually for _Academic purposes_.
 
 The functionalities in the app are:
@@ -10,5 +12,3 @@ The functionalities in the app are:
 5. Export data in different formats - pdfs, excel, etc.
 6. Zoom in or Zoom out the table.
 7. Dynamically add/remove columns.
-
-<center><img src="Extras/splash_screen.jpg" width="320" height="550"></center>
