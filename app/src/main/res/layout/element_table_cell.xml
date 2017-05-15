@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:id="@+id/rlTableCell">
+
+        <ImageView
+            android:layout_width="1sp" android:layout_height="48sp"
+            android:id="@+id/ivDividerRight" android:layout_alignParentRight="true"
+            android:background="@color/custom_table_divider" />
+
+        <ImageView
+            android:layout_width="1sp" android:layout_height="48sp"
+            android:id="@+id/ivDividerLeft" android:layout_alignParentLeft="true"
+            android:background="@color/custom_table_divider" />
+
+        <ImageView
+            android:layout_width="1sp" android:layout_height="48sp"
+            android:id="@+id/ivDividerBottom" android:layout_alignParentBottom="true"
+            android:background="@color/custom_table_divider" />
+
+        <EditText
+            android:layout_width="match_parent" android:layout_height="32sp"
+            android:id="@+id/etTableValue" android:layout_centerInParent="true"
+            android:layout_margin="8sp"/>
+
+</RelativeLayout>

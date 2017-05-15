@@ -24,16 +24,13 @@ public class DatabaseManager {
     public static final String KEY_EXPERIMENT_ID = "experiment_id";
     public static final String KEY_TITLE = "title";
     public static final String KEY_SUBJECT = "subject";
+    public static final String KEY_COLUMN_NAMES = "column_names";
     public static final String KEY_DATE= "date";
     public static final String KEY_TIME = "time";
     public static final String KEY_STAR_TYPE = "star_type";
 
-    public static final String KEY_RECORD_ID = "record_id";
-    public static final String KEY_RECORD = "record";
-
     private static final String DATABASE_NAME = "helpEx";
     private static final String TABLE_EXPERIMENT_DETAILS = "ExperimentDetails";
-    private static final String TABLE_EXPERIMENT_RECORDS = "ExperimentRecords";
     private static final int DATABASE_VERSION = 1;
 
     private DbHelper ourHelper, ourHelperRecords;
@@ -54,6 +51,7 @@ public class DatabaseManager {
                             KEY_EXPERIMENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                             KEY_TITLE + " TEXT NOT NULL, " +
                             KEY_SUBJECT + " TEXT NOT NULL, " +
+                            KEY_COLUMN_NAMES + " TEXT NOT NULL, " +
                             KEY_STAR_TYPE + " INTEGER NOT NULL, " +
                             KEY_DATE + " TEXT NOT NULL, " +
                             KEY_TIME + " TEXT NOT NULL);"
@@ -85,6 +83,7 @@ public class DatabaseManager {
         ContentValues cv = new ContentValues();
         cv.put(KEY_TITLE, data.title);
         cv.put(KEY_SUBJECT, data.subject);
+        cv.put(KEY_COLUMN_NAMES, data.columnNames);
         cv.put(KEY_STAR_TYPE, data.starType.getInt());
         cv.put(KEY_DATE, data.date);
         cv.put(KEY_TIME, data.time);
@@ -94,26 +93,57 @@ public class DatabaseManager {
     }
 
     public ArrayList<DataExperiment> getExperimentDetails(){
-        String[] columns = new String[]{KEY_EXPERIMENT_ID, KEY_TITLE, KEY_SUBJECT, KEY_STAR_TYPE, KEY_DATE, KEY_TIME};
-        Cursor c = ourDatabase.query(TABLE_EXPERIMENT_DETAILS, columns, null, null, null, null, null);
+        String[] columns = new String[]{KEY_EXPERIMENT_ID, KEY_TITLE, KEY_SUBJECT, KEY_COLUMN_NAMES, KEY_STAR_TYPE, KEY_DATE, KEY_TIME};
+        Cursor cursor = ourDatabase.query(TABLE_EXPERIMENT_DETAILS, columns, null, null, null, null, null);
 
         ArrayList<DataExperiment> experimentDetails= new ArrayList<>();
-        int iRowId = c.getColumnIndex(KEY_EXPERIMENT_ID);
-        int iTitle = c.getColumnIndex(KEY_TITLE);
-        int iSubject = c.getColumnIndex(KEY_SUBJECT);
-        int iStarType = c.getColumnIndex(KEY_STAR_TYPE);
-        int iDate = c.getColumnIndex(KEY_DATE);
-        int iTime = c.getColumnIndex(KEY_TIME);
+        int iRowId = cursor.getColumnIndex(KEY_EXPERIMENT_ID);
+        int iTitle = cursor.getColumnIndex(KEY_TITLE);
+        int iSubject = cursor.getColumnIndex(KEY_SUBJECT);
+        int iColumnNames = cursor.getColumnIndex(KEY_COLUMN_NAMES);
+        int iStarType = cursor.getColumnIndex(KEY_STAR_TYPE);
+        int iDate = cursor.getColumnIndex(KEY_DATE);
+        int iTime = cursor.getColumnIndex(KEY_TIME);
 
-        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-            DataExperiment data = new DataExperiment(c.getLong(iRowId), c.getString(iTitle), c.getString(iSubject),
-                    c.getString(iDate), c.getString(iTime), c.getInt(iStarType));
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            DataExperiment data = new DataExperiment(cursor.getLong(iRowId), cursor.getString(iTitle), cursor.getString(iSubject),
+                    cursor.getString(iColumnNames), cursor.getString(iDate), cursor.getString(iTime), cursor.getInt(iStarType));
             experimentDetails.add(data);
-            Log.d(LOG_TAG, "Entry Id: " + c.getInt(iRowId) + " : " + c.getString(iTitle));
+            Log.d(LOG_TAG, "Entry Id: " + cursor.getInt(iRowId) + " : " + cursor.getString(iTitle));
         }
 
         Log.d(LOG_TAG, "Size: " + experimentDetails.size());
+        cursor.close();
         return experimentDetails;
+    }
+
+    public DataExperiment getExperimentDetails(long rowId){
+        String[] columns = new String[]{KEY_EXPERIMENT_ID, KEY_TITLE, KEY_SUBJECT, KEY_COLUMN_NAMES, KEY_STAR_TYPE,
+                KEY_DATE, KEY_TIME};
+        Log.d(LOG_TAG, "SELECT * FROM " + TABLE_EXPERIMENT_DETAILS +
+                " WHERE " + KEY_EXPERIMENT_ID + " = " + rowId);
+        Cursor cursor = ourDatabase.rawQuery("SELECT * FROM " + TABLE_EXPERIMENT_DETAILS +
+                " WHERE " + KEY_EXPERIMENT_ID + " = ?", new String[]{rowId + ""});
+
+        DataExperiment experimentDetail = null;
+        int iRowId = cursor.getColumnIndex(KEY_EXPERIMENT_ID);
+        int iTitle = cursor.getColumnIndex(KEY_TITLE);
+        int iSubject = cursor.getColumnIndex(KEY_SUBJECT);
+        int iColumnNames = cursor.getColumnIndex(KEY_COLUMN_NAMES);
+        int iStarType = cursor.getColumnIndex(KEY_STAR_TYPE);
+        int iDate = cursor.getColumnIndex(KEY_DATE);
+        int iTime = cursor.getColumnIndex(KEY_TIME);
+
+        if(cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            DataExperiment data = new DataExperiment(cursor.getLong(iRowId), cursor.getString(iTitle), cursor.getString(iSubject),
+                    cursor.getString(iColumnNames), cursor.getString(iDate), cursor.getString(iTime), cursor.getInt(iStarType));
+            experimentDetail = data;
+            Log.d(LOG_TAG, "Entry Id: " + cursor.getInt(iRowId) + " : " + cursor.getString(iTitle));
+        }
+
+        cursor.close();
+        return experimentDetail;
     }
 
     private boolean isEmpty(){
@@ -135,6 +165,7 @@ public class DatabaseManager {
             ContentValues cvUpdate = new ContentValues();
             cvUpdate.put(KEY_TITLE, data.title);
             cvUpdate.put(KEY_SUBJECT, data.subject);
+            cvUpdate.put(KEY_COLUMN_NAMES, data.columnNames);
             cvUpdate.put(KEY_STAR_TYPE, data.starType.getInt());
             cvUpdate.put(KEY_DATE, data.date);
             cvUpdate.put(KEY_TIME, data.time);

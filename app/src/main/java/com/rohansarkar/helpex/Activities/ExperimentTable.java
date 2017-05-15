@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -25,24 +26,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.rohansarkar.helpex.Adapters.HomeAdapter;
 import com.rohansarkar.helpex.Adapters.NewColumnAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
 import com.rohansarkar.helpex.R;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-
-import Assets.Util;
 
 /**
  * Created by rohan on 11/5/17.
  */
 public class ExperimentTable extends AppCompatActivity implements View.OnClickListener{
 
+    private static final String LOG_TAG = "ExperimentTable";
     RecyclerView recyclerView;
     RecyclerView.Adapter adapter;
     RecyclerView.LayoutManager layoutManager;
@@ -50,15 +46,17 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     Toolbar toolbar;
     ImageView overflowMenu;
     TextView toolbarTitle;
+    TextView emptyLayout;
 
     DatabaseManager detailsManager;
-    DataExperiment experimentDate;
-    int position;
+    DataExperiment experimentData;
+    ArrayList<String> columnList;
+    long rowId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_experiment_table);
 
         init();
         getData();
@@ -66,22 +64,15 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
         detailsManager.close();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        detailsManager.open();
-        getData();
-    }
-
     private void getData(){
-        position = getIntent().getIntExtra("position", -1);
-        ArrayList<DataExperiment> experiments = detailsManager.getExperimentDetails();
-        experimentDate = experiments.get(position);
+        rowId = getIntent().getLongExtra("rowId", -1);
+        experimentData = detailsManager.getExperimentDetails(rowId);
+        columnList = getColumnList(experimentData.columnNames);
 //        experiments = detailsManager.getExperimentDetails();
 //        setRecyclerView(experiments);
     }
@@ -91,17 +82,23 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     * */
 
     private void init(){
-        recyclerView = (RecyclerView) findViewById(R.id.rvHome);
-        layout= (CoordinatorLayout) findViewById(R.id.clHome);
+        recyclerView = (RecyclerView) findViewById(R.id.rvExperimentTable);
+        layout= (CoordinatorLayout) findViewById(R.id.clExperimentTable);
+        emptyLayout = (TextView) findViewById(R.id.tvEmptyTable);
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
+        columnList = new ArrayList<>();
+
+        emptyLayout.setOnClickListener(this);
+
         detailsManager = new DatabaseManager(this);
+        detailsManager.open();
     }
 
     private void setToolbar(){
-        toolbar = (Toolbar) findViewById(R.id.tbHome);
+        toolbar = (Toolbar) findViewById(R.id.tbExperimentTable);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -114,7 +111,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         overflowMenu.setOnClickListener(this);
 
         toolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
-        toolbarTitle.setText("Malus Law");
+        toolbarTitle.setText(experimentData.title);
     }
 
     @Override
@@ -128,7 +125,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         if(menuItem.getItemId() == R.id.popup_add_columns){
-                            showToast("Add columns");
+                            launchNewColumnDialog();
                         }
                         else if(menuItem.getItemId() == R.id.popup_plot_graph){
                             showToast("Plot Graph");
@@ -141,7 +138,19 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                 });
                 toolbarMenu.show();
                 break;
+
+            case R.id.tvEmptyTable:
+                launchNewColumnDialog();
+                break;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setRecyclerView(Dialog dialog, RecyclerView dialogRecyclelrView, RecyclerView.Adapter dialogAdapter,
@@ -150,9 +159,8 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         dialogRecyclelrView.setAdapter(dialogAdapter);
     }
 
-    private void launchNewColumnDialog(final String title, final String subject){
+    private void launchNewColumnDialog(){
         final Dialog dialog= new Dialog(this);
-//        dialog.getWindow().getAttributes().windowAnimations= R.style.CustomLeftDialogAnimation;
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_new_columns);
 
@@ -164,13 +172,18 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         window.setAttributes(lp);
 
         final ArrayList<String> columnNames = new ArrayList<>();
-        columnNames.add("x");
+        for(int i=0; i<columnList.size(); i++){
+            columnNames.add(columnList.get(i));
+        }
 
         final EditText columnName = (EditText) dialog.findViewById(R.id.etColumnName);
         final RelativeLayout dialogLayout= (RelativeLayout) dialog.findViewById(R.id.rlNewColumn);
         Button addColumn = (Button) dialog.findViewById(R.id.bAddColumn);
         Button createNewExperiment= (Button) dialog.findViewById(R.id.bNewExperiment);
         ImageView back = (ImageView) dialog.findViewById(R.id.ivBack);
+
+        columnName.requestFocus();
+        showKeyboard();
 
         final RecyclerView dialogRecylerView= (RecyclerView) dialog.findViewById(R.id.rvNewExperiment);
         LinearLayoutManager dialogLayoutManager = new LinearLayoutManager(dialog.getContext());
@@ -186,6 +199,8 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                 if(columnName.getText().toString().trim().length()>0){
                     columnNames.add(columnName.getText().toString());
                     setRecyclerView(dialog, dialogRecylerView, detailsAdapter, columnNames, dialogLayout);
+                    dialogRecylerView.scrollToPosition(columnNames.size()-1);
+                    columnName.setText("");
                 }
             }
         };
@@ -193,27 +208,17 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         View.OnClickListener createNewExperimentListener= new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(title.trim().length()>0){
-                    DataExperiment data = new DataExperiment();
-                    data.title = title;
-                    data.starType = Util.StarType.NOT_STARRED;
-                    data.date = "12/03/2017";
-                    data.time = "12:07 PM";
-
-                    if(subject.trim().length()>0)
-                        data.subject = subject;
-                    else
-                        data.subject = "";
-
-                    data.experimentID = detailsManager.createEntry(data);
-
-//                    experiments.add(data);
-//                    setRecyclerView(experiments);
-
-                    dialog.dismiss();
-                }
+                updateColumns(columnNames);
+                dialog.dismiss();
             }
         };
+
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                hideKeyboard();
+            }
+        });
 
         View.OnClickListener backListener = new View.OnClickListener() {
             @Override
@@ -241,5 +246,39 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     private void hideKeyboard(){
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
+    }
+
+    //Database APIs
+    private void updateColumns(ArrayList<String> columnNames){
+        experimentData.columnNames = getColumnString(columnNames);
+        columnList = columnNames;
+        Log.d(LOG_TAG, "columnNames: " + experimentData.columnNames + "columnNames.size : " + columnNames.size());
+        detailsManager.updateEntry(experimentData);
+    }
+
+    //String Slicing for Columns
+    private ArrayList<String> getColumnList(String columnNames){
+        ArrayList<String> columns = new ArrayList<>();
+        String[] columnArray = columnNames.split("~");
+
+        for(int i=0; i<columnArray.length; i++){
+            columns.add(columnArray[i]);
+        }
+        return columns;
+    }
+    private String getColumnString(ArrayList<String> columnNames){
+        String columnString = "";
+
+        if(columnNames.size()==1){
+            columnString = columnNames.get(0);
+        }
+        else if(columnNames.size() > 1){
+            columnString = columnNames.get(0);
+            for(int i=1; i<columnNames.size(); i++){
+                columnString += "~" + columnNames.get(i);
+            }
+        }
+
+        return columnString;
     }
 }

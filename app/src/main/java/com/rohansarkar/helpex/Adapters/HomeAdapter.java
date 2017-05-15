@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -156,7 +157,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder>{
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(context, ExperimentTable.class);
-                i.putExtra("position", position);
+                i.putExtra("rowId", experiments.get(position).experimentID);
+                Log.d(LOG_TAG, experiments.get(position).experimentID + " : experiment ID");
                 context.startActivity(i);
             }
         };

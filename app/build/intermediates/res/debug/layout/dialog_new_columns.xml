@@ -28,8 +28,8 @@
         android:layout_centerVertical="true" android:layout_marginTop="16sp">
 
         <Button
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Done" android:textSize="14sp"
+            android:layout_width="128sp" android:layout_height="wrap_content"
+            android:text="Add Column" android:textSize="14sp"
             android:textColor="#eeeeee" android:background="@color/custom_dialog_button_background"
             android:layout_alignParentRight="true" android:id="@+id/bAddColumn"/>
 
@@ -41,7 +41,7 @@
             <EditText
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:hint="Column Name" android:id="@+id/etColumnName"
-                android:inputType="textCapWords"/>
+                android:inputType="textCapWords" android:focusableInTouchMode="true"/>
         </android.support.design.widget.TextInputLayout>
 
     </RelativeLayout>
@@ -49,7 +49,7 @@
     <Button
         android:layout_width="match_parent" android:layout_height="58sp"
         android:textColor="#eeeeee" android:background="@color/custom_dialog_button_background"
-        android:layout_centerHorizontal="true" android:text="Create New Experiment"
+        android:layout_centerHorizontal="true" android:text="Done"
         android:layout_marginTop="14sp"
         android:id="@+id/bNewExperiment" android:layout_alignParentBottom="true"/>
 

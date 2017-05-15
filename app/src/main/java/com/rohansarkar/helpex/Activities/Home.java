@@ -200,6 +200,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
                     data.title = title.getText().toString();
                     data.starType = Util.StarType.NOT_STARRED;
                     data.subject = subject.getText().toString();
+                    data.columnNames = "";
 
                     //Get current Date & Time.
                     DateFormat dfDate = new SimpleDateFormat("yyyy/mm/dd");
