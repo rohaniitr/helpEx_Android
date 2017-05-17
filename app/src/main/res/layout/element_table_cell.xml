@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" android:layout_height="wrap_content"
-    android:id="@+id/rlTableCell">
+    android:layout_width="wrap_content" android:layout_height="?attr/actionBarSize">
+
+    <RelativeLayout
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:id="@+id/rlTableCell">
 
         <ImageView
             android:layout_width="1sp" android:layout_height="48sp"
@@ -20,7 +23,22 @@
 
         <EditText
             android:layout_width="match_parent" android:layout_height="32sp"
-            android:id="@+id/etTableValue" android:layout_centerInParent="true"
+            android:id="@+id/etTableCell" android:layout_centerInParent="true"
+            android:layout_marginRight="16sp" android:layout_marginLeft="16sp"
             android:layout_margin="8sp"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:id="@+id/rlHeader" android:background="@color/custom_table_header_background">
+
+        <TextView
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:id="@+id/tvTableHeader" android:layout_centerInParent="true"
+            android:layout_marginRight="16sp" android:layout_marginLeft="16sp"
+            android:layout_margin="8sp" android:textColor="#eeeeee"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>

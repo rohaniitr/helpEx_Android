@@ -15,11 +15,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
@@ -27,11 +29,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rohansarkar.helpex.Adapters.NewColumnAdapter;
+import com.rohansarkar.helpex.Adapters.TableAdapter;
+import com.rohansarkar.helpex.Adapters.TableRowAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
 import com.rohansarkar.helpex.R;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
+
+import Assets.TableHorizontalScrollView;
 
 /**
  * Created by rohan on 11/5/17.
@@ -47,10 +55,13 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     ImageView overflowMenu;
     TextView toolbarTitle;
     TextView emptyLayout;
+    TableHorizontalScrollView.OnScrollListener listener;
+    ViewGroup tableHeader;
 
     DatabaseManager detailsManager;
     DataExperiment experimentData;
     ArrayList<String> columnList;
+    ArrayList<String> tableData;
     long rowId;
 
     @Override
@@ -61,6 +72,8 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         init();
         getData();
         setToolbar();
+        setRecyclerView(tableData);
+        emptyLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -77,6 +90,14 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 //        setRecyclerView(experiments);
     }
 
+    private void setRecyclerView(ArrayList<String> dataExperiments){
+        Log.d(LOG_TAG, "8");
+        adapter = new TableAdapter(dataExperiments, this, layout, listener);
+        Log.d(LOG_TAG, "9");
+        recyclerView.setAdapter(adapter);
+        Log.d(LOG_TAG, "10");
+    }
+
     /*
     **Initializations.
     * */
@@ -85,16 +106,33 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         recyclerView = (RecyclerView) findViewById(R.id.rvExperimentTable);
         layout= (CoordinatorLayout) findViewById(R.id.clExperimentTable);
         emptyLayout = (TextView) findViewById(R.id.tvEmptyTable);
+        tableHeader = (ViewGroup) findViewById(R.id.tableHeader);
 
+        Log.d(LOG_TAG, "1");
         layoutManager = new LinearLayoutManager(this);
+        Log.d(LOG_TAG, "2");
         recyclerView.setLayoutManager(layoutManager);
+        Log.d(LOG_TAG, "3");
 
         columnList = new ArrayList<>();
+        tableData = new ArrayList<>();
+        for(int i=0; i<30; i++)
+            tableData.add("" + (i+1));
 
         emptyLayout.setOnClickListener(this);
 
         detailsManager = new DatabaseManager(this);
         detailsManager.open();
+
+        listener = new TableHorizontalScrollView.OnScrollListener() {
+            @Override
+            public void onScroll(HorizontalScrollView view, int x, int y) {
+                EventBus.getDefault().post(new Event(view, x, y));
+            }
+        };
+        tableHeader.setBackgroundColor(Color.parseColor("#bbbbbb"));
+        tableHeader.getChildAt(0).setBackgroundColor(Color.WHITE);
+        ((TableHorizontalScrollView) tableHeader.findViewById(R.id.hsvTableRow)).setOnScrollListener(listener);
     }
 
     private void setToolbar(){
@@ -280,5 +318,31 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         }
 
         return columnString;
+    }
+
+    //EVENT Class.
+    public static class Event {
+
+        private final int x;
+        private final int y;
+        private final HorizontalScrollView view;
+
+        public Event(HorizontalScrollView view, int x, int y) {
+            this.x = x;
+            this.y = y;
+            this.view = view;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        public HorizontalScrollView getView() {
+            return view;
+        }
     }
 }
