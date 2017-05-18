@@ -9,6 +9,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,27 +27,23 @@ import Assets.TableHorizontalScrollView;
 public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder>{
     private Context context;
     private CoordinatorLayout layout;
-//    private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
-    LinearLayoutManager layoutManager;
     private TableHorizontalScrollView.OnScrollListener listener;
 
     private ArrayList<String> tableData;
+    ArrayList<ArrayList<View>> cells;
 
     String LOG_TAG= "TableAdapter Logs";
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView rowNo;
-        RecyclerView recyclerView;
+        LinearLayout rowLayout;
         TableHorizontalScrollView scrollView;
 
         public ViewHolder(View v) {
             super(v);
             rowNo = (TextView) v.findViewById(R.id.tvTableRowNo);
             scrollView = (TableHorizontalScrollView) v.findViewById(R.id.hsvTableRow);
-            Log.d(LOG_TAG, "14");
-            recyclerView = (RecyclerView) v.findViewById(R.id.rvExperimentRow);
-            Log.d(LOG_TAG, "15");
+            rowLayout = (LinearLayout) v.findViewById(R.id.llTableRow);
         }
     }
 
@@ -54,6 +53,23 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder>{
         this.layout= layout;
         this.context= context;
         this.listener = listener;
+
+        if(cells == null) {
+            cells = new ArrayList<>();
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(320,200);
+
+            for (int i = 0; i < tableData.size(); i++) {
+                ArrayList<View> rows = new ArrayList<>();
+
+                for (int j = 0; j < 6; j++) {
+                    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View cellView = inflater.inflate(R.layout.element_table_cell, null, false);
+                    cellView.setLayoutParams(params);
+                    rows.add(cellView);
+                }
+                cells.add(rows);
+            }
+        }
     }
 
     @Override
@@ -65,21 +81,17 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        Log.d(LOG_TAG, "11");
-        holder.rowNo.setText(tableData.get(position));
-        Log.d(LOG_TAG, "12");
+        holder.setIsRecyclable(false);
+        holder.rowNo.setText(tableData.get(holder.getPosition()));
         holder.rowNo.setHeight(160);
-        Log.d(LOG_TAG, "13");
         holder.scrollView.setOnScrollListener(listener);
 
-        Log.d(LOG_TAG, "1");
-        layoutManager = new LinearLayoutManager(context);
-        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        Log.d(LOG_TAG, "2");
-        holder.recyclerView.setLayoutManager(layoutManager);
-        Log.d(LOG_TAG, "3");
-        setRecyclerView(holder, tableData, position);
-        Log.d(LOG_TAG, "4");
+        if(holder.rowLayout != null)
+            holder.rowLayout.removeAllViews();
+
+        Log.d(LOG_TAG, "Position: " + holder.getPosition() + ", " + holder.rowLayout.getChildCount());
+        for(int i=0; i<6; i++)
+            holder.rowLayout.addView(cells.get(holder.getPosition()).get(i));
     }
 
     @Override
@@ -98,14 +110,6 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder>{
     /*
     **Display Assets..
     * */
-
-    private void setRecyclerView(ViewHolder holder, ArrayList<String> list, int position){
-        Log.d(LOG_TAG, "5");
-        adapter = new TableRowAdapter(list, context, layout, position, listener);
-        Log.d(LOG_TAG, "6");
-        holder.recyclerView.setAdapter(adapter);
-        Log.d(LOG_TAG, "7");
-    }
 
     private void showSnackBar(String message){
         if(layout!= null)

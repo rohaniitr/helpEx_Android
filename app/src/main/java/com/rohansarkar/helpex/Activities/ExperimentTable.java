@@ -76,6 +76,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         emptyLayout.setVisibility(View.GONE);
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -91,11 +92,8 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     }
 
     private void setRecyclerView(ArrayList<String> dataExperiments){
-        Log.d(LOG_TAG, "8");
         adapter = new TableAdapter(dataExperiments, this, layout, listener);
-        Log.d(LOG_TAG, "9");
         recyclerView.setAdapter(adapter);
-        Log.d(LOG_TAG, "10");
     }
 
     /*
@@ -108,11 +106,8 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         emptyLayout = (TextView) findViewById(R.id.tvEmptyTable);
         tableHeader = (ViewGroup) findViewById(R.id.tableHeader);
 
-        Log.d(LOG_TAG, "1");
         layoutManager = new LinearLayoutManager(this);
-        Log.d(LOG_TAG, "2");
         recyclerView.setLayoutManager(layoutManager);
-        Log.d(LOG_TAG, "3");
 
         columnList = new ArrayList<>();
         tableData = new ArrayList<>();

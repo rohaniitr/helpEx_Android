@@ -3,7 +3,7 @@
     android:layout_width="wrap_content" android:layout_height="?attr/actionBarSize">
 
     <RelativeLayout
-        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
         android:id="@+id/rlTableCell">
 
         <ImageView
@@ -30,11 +30,11 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
         android:id="@+id/rlHeader" android:background="@color/custom_table_header_background">
 
-        <TextView
-            android:layout_width="match_parent" android:layout_height="match_parent"
+        <Assets.TextViewGrandHotel
+            android:layout_width="match_parent" android:layout_height="32sp"
             android:id="@+id/tvTableHeader" android:layout_centerInParent="true"
             android:layout_marginRight="16sp" android:layout_marginLeft="16sp"
             android:layout_margin="8sp" android:textColor="#eeeeee"/>

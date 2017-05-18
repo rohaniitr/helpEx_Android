@@ -58,11 +58,11 @@ public final class R {
 		public static final int common_signin_btn_text_pressed_light = 0x7f020054;
 	}
 	public static final class id {
-		public static final int adjust_height = 0x7f0c002b;
-		public static final int adjust_width = 0x7f0c002c;
-		public static final int none = 0x7f0c000f;
-		public static final int normal = 0x7f0c000b;
-		public static final int wrap_content = 0x7f0c0036;
+		public static final int adjust_height = 0x7f0c002c;
+		public static final int adjust_width = 0x7f0c002d;
+		public static final int none = 0x7f0c0010;
+		public static final int normal = 0x7f0c000c;
+		public static final int wrap_content = 0x7f0c0037;
 	}
 	public static final class integer {
 		public static final int google_play_services_version = 0x7f0a0005;
