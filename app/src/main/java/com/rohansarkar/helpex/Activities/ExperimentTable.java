@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -30,12 +32,12 @@ import android.widget.Toast;
 
 import com.rohansarkar.helpex.Adapters.NewColumnAdapter;
 import com.rohansarkar.helpex.Adapters.TableAdapter;
-import com.rohansarkar.helpex.Adapters.TableRowAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
 import com.rohansarkar.helpex.R;
 
 import org.greenrobot.eventbus.EventBus;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -54,14 +56,17 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     Toolbar toolbar;
     ImageView overflowMenu;
     TextView toolbarTitle;
-    TextView emptyLayout;
+    RelativeLayout emptyLayout;   //If NumberOfColumns <= 0
+    RelativeLayout tableLayout;   //If NumberOfColumns > 0
+    LinearLayout headerView;
+    TableHorizontalScrollView headerScrollView;
     TableHorizontalScrollView.OnScrollListener listener;
-    ViewGroup tableHeader;
+    ViewGroup headerViewGroup;
 
     DatabaseManager detailsManager;
     DataExperiment experimentData;
     ArrayList<String> columnList;
-    ArrayList<String> tableData;
+    ArrayList<ArrayList<String>> tableData;
     long rowId;
 
     @Override
@@ -71,9 +76,10 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
         init();
         getData();
+        setTableHeader();
+        setLayoutVisibility();
         setToolbar();
-        setRecyclerView(tableData);
-        emptyLayout.setVisibility(View.GONE);
+        setRecyclerView(tableData, columnList);
     }
 
 
@@ -84,15 +90,26 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     }
 
     private void getData(){
+        //Get Row ID of Experiment.
         rowId = getIntent().getLongExtra("rowId", -1);
+        //Get Details of the Experiment.
         experimentData = detailsManager.getExperimentDetails(rowId);
         columnList = getColumnList(experimentData.columnNames);
+        Log.d(LOG_TAG, "ColumnList Size : " + columnList.size());
+
+        //Get Table Data for  the Experiment.
+        for(int i=0; i<30; i++) {
+            ArrayList<String> rowData = new ArrayList<>();
+            for(int j=0; j<10; j++)
+                rowData.add(2.34 + "");
+            tableData.add(rowData);
+        }
 //        experiments = detailsManager.getExperimentDetails();
 //        setRecyclerView(experiments);
     }
 
-    private void setRecyclerView(ArrayList<String> dataExperiments){
-        adapter = new TableAdapter(dataExperiments, this, layout, listener);
+    private void setRecyclerView(ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList){
+        adapter = new TableAdapter(tableData, columnList, this, layout, listener, headerScrollView);
         recyclerView.setAdapter(adapter);
     }
 
@@ -103,21 +120,23 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     private void init(){
         recyclerView = (RecyclerView) findViewById(R.id.rvExperimentTable);
         layout= (CoordinatorLayout) findViewById(R.id.clExperimentTable);
-        emptyLayout = (TextView) findViewById(R.id.tvEmptyTable);
-        tableHeader = (ViewGroup) findViewById(R.id.tableHeader);
+        emptyLayout = (RelativeLayout) findViewById(R.id.rlEmptyLayout);
+        tableLayout = (RelativeLayout) findViewById(R.id.rlTableLayout);
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
         columnList = new ArrayList<>();
-        tableData = new ArrayList<>();
-        for(int i=0; i<30; i++)
-            tableData.add("" + (i+1));
+        tableData = new ArrayList<ArrayList<String>>();
 
         emptyLayout.setOnClickListener(this);
 
         detailsManager = new DatabaseManager(this);
         detailsManager.open();
+
+        //Table Header
+        headerViewGroup = (ViewGroup) findViewById(R.id.tableHeader);
+        headerView = (LinearLayout) headerViewGroup.findViewById(R.id.llTableRow);
 
         listener = new TableHorizontalScrollView.OnScrollListener() {
             @Override
@@ -125,9 +144,8 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                 EventBus.getDefault().post(new Event(view, x, y));
             }
         };
-        tableHeader.setBackgroundColor(Color.parseColor("#bbbbbb"));
-        tableHeader.getChildAt(0).setBackgroundColor(Color.WHITE);
-        ((TableHorizontalScrollView) tableHeader.findViewById(R.id.hsvTableRow)).setOnScrollListener(listener);
+        headerScrollView = (TableHorizontalScrollView) headerViewGroup.findViewById(R.id.hsvTableRow);
+        headerScrollView.setOnScrollListener(listener);
     }
 
     private void setToolbar(){
@@ -145,6 +163,22 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
         toolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
         toolbarTitle.setText(experimentData.title);
+    }
+
+    private void setTableHeader(){
+        headerScrollView.removeAllViews();
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(320, ViewGroup.LayoutParams.MATCH_PARENT);
+
+        for(int i=0; i<columnList.size(); i++){
+            View cellView = inflater.inflate(R.layout.element_table_header_cell, null, false);
+            cellView.setLayoutParams(params);
+
+            TextView column = (TextView) cellView.findViewById(R.id.tvTableHeader);
+            column.setText(columnList.get(i));
+
+            headerView.addView(cellView);
+        }
     }
 
     @Override
@@ -172,7 +206,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                 toolbarMenu.show();
                 break;
 
-            case R.id.tvEmptyTable:
+            case R.id.rlEmptyLayout:
                 launchNewColumnDialog();
                 break;
         }
@@ -287,11 +321,39 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         columnList = columnNames;
         Log.d(LOG_TAG, "columnNames: " + experimentData.columnNames + "columnNames.size : " + columnNames.size());
         detailsManager.updateEntry(experimentData);
+        //Show Table if Columns present in  table.
+        setLayoutVisibility();
+        //Update the table.
+        refreshTable();
+    }
+
+    //Updates the Table.
+    private void refreshTable(){
+        setTableHeader();
+
+        //Body Logic here.
+        if(tableData.isEmpty()){
+
+        }
+
+        for(int i=0; i<tableData.size(); i++){
+            for(int j= tableData.get(i).size(); j<columnList.size(); j++){
+
+            }
+        }
+
+        //Update Database for Table  Data.
     }
 
     //String Slicing for Columns
     private ArrayList<String> getColumnList(String columnNames){
         ArrayList<String> columns = new ArrayList<>();
+
+        //Empty Columns.
+        if(columnNames.trim().length() <=0)
+            return columns;
+
+        //Slicing ColumnList String.
         String[] columnArray = columnNames.split("~");
 
         for(int i=0; i<columnArray.length; i++){
@@ -313,6 +375,19 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         }
 
         return columnString;
+    }
+
+    //If Table has Columns -> Show Table.
+    //Else show  options for adding Columns.
+    private void setLayoutVisibility(){
+        if(columnList.size()>0){
+            tableLayout.setVisibility(View.VISIBLE);
+            emptyLayout.setVisibility(View.GONE);
+        }
+        else{
+            tableLayout.setVisibility(View.GONE);
+            emptyLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     //EVENT Class.

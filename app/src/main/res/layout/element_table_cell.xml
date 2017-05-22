@@ -7,37 +7,27 @@
         android:id="@+id/rlTableCell">
 
         <ImageView
-            android:layout_width="1sp" android:layout_height="48sp"
+            android:layout_width="1sp" android:layout_height="match_parent"
             android:id="@+id/ivDividerRight" android:layout_alignParentRight="true"
             android:background="@color/custom_table_divider" />
 
         <ImageView
-            android:layout_width="1sp" android:layout_height="48sp"
+            android:layout_width="1sp" android:layout_height="match_parent"
             android:id="@+id/ivDividerLeft" android:layout_alignParentLeft="true"
             android:background="@color/custom_table_divider" />
 
         <ImageView
-            android:layout_width="1sp" android:layout_height="48sp"
+            android:layout_width="match_parent" android:layout_height="2sp"
             android:id="@+id/ivDividerBottom" android:layout_alignParentBottom="true"
             android:background="@color/custom_table_divider" />
 
-        <EditText
+        <Assets.EditTextGrandHotel
             android:layout_width="match_parent" android:layout_height="32sp"
             android:id="@+id/etTableCell" android:layout_centerInParent="true"
             android:layout_marginRight="16sp" android:layout_marginLeft="16sp"
-            android:layout_margin="8sp"/>
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-        android:id="@+id/rlHeader" android:background="@color/custom_table_header_background">
-
-        <Assets.TextViewGrandHotel
-            android:layout_width="match_parent" android:layout_height="32sp"
-            android:id="@+id/tvTableHeader" android:layout_centerInParent="true"
-            android:layout_marginRight="16sp" android:layout_marginLeft="16sp"
-            android:layout_margin="8sp" android:textColor="#eeeeee"/>
+            android:layout_margin="8sp" android:background="@android:color/transparent"
+            android:inputType="numberDecimal" android:gravity="center_horizontal"
+            android:textSize="24sp"/>
 
     </RelativeLayout>
 

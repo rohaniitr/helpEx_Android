@@ -17,6 +17,7 @@
     <color name="custom_dialog_button_background">#1a7ba3</color>
 
     <color name="custom_table_divider">#551a7ba3</color>
+    <color name="custom_table_header_divider">#eeeeeeee</color>
     <color name="custom_table_header_background">#219bce</color>
 
 </resources>

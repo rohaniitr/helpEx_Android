@@ -62,6 +62,7 @@
     <color name="custom_primary_light_color">#ffffff</color>
     <color name="custom_table_divider">#551a7ba3</color>
     <color name="custom_table_header_background">#219bce</color>
+    <color name="custom_table_header_divider">#eeeeeeee</color>
     <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.1/res/values/values.xml -->
     <eat-comment/>
     <color name="dim_foreground_disabled_material_dark">#80bebebe</color>

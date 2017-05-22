@@ -34,22 +34,32 @@
 
         </android.support.v7.widget.Toolbar>
 
-        <include
-            android:id="@+id/tableHeader" layout="@layout/element_table_row"
-            android:layout_height="wrap_content" android:layout_width="match_parent"
-            android:layout_below="@+id/tbExperimentTable"/>
+    <RelativeLayout
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:id="@+id/rlTableLayout" android:layout_below="@+id/tbExperimentTable">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvExperimentTable"
-            android:layout_width="match_parent" android:layout_height="match_parent"
-            android:nestedScrollingEnabled="true" android:layout_below="@+id/tableHeader"/>
+            <include
+                android:id="@+id/tableHeader" layout="@layout/element_table_row"
+                android:layout_height="?attr/actionBarSize" android:layout_width="match_parent"/>
 
-        <Assets.TextViewCaviarDreams
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvExperimentTable"
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:nestedScrollingEnabled="true" android:layout_below="@+id/tableHeader"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
             android:layout_width="match_parent" android:layout_height="match_parent"
-            android:textColor="#666666" android:textSize="28sp"
-            android:gravity="center" android:layout_marginRight="16sp"
-            android:id="@+id/tvEmptyTable" android:layout_below="@+id/tbExperimentTable"
-            android:text="No Columns Added yet !!\nTap to add columns for Experiment Table."/>
+            android:id="@+id/rlEmptyLayout" android:layout_below="@+id/tbExperimentTable">
+
+            <Assets.TextViewCaviarDreams
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:textColor="#666666" android:textSize="28sp"
+                android:gravity="center" android:layout_marginRight="16sp"
+                android:text="No Columns Added yet !!\nTap to add columns for Experiment Table."/>
+
+        </RelativeLayout>
 
     </RelativeLayout>
 
