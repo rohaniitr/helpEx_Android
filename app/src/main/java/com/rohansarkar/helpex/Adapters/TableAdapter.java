@@ -31,9 +31,6 @@ import Assets.TableHorizontalScrollView;
 public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder>{
     private Context context;
     private CoordinatorLayout layout;
-    private LayoutInflater inflater;
-    private TableHorizontalScrollView.OnScrollListener listener;
-    private TableHorizontalScrollView headerScrollView;
 
     private ArrayList<ArrayList<String>> tableData;
     private ArrayList<String> columnList;
@@ -43,65 +40,42 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder>{
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView rowNo;
         LinearLayout rowLayout;
-        TableHorizontalScrollView scrollView;
-        ArrayList<EditText> rowList;
+        RecyclerView rowRecyclerView;
 
         public ViewHolder(View v) {
             super(v);
             rowNo = (TextView) v.findViewById(R.id.tvTableRowNo);
-            scrollView = (TableHorizontalScrollView) v.findViewById(R.id.hsvTableRow);
+            rowRecyclerView = (RecyclerView) v.findViewById(R.id.rvTableRow);
             rowLayout = (LinearLayout) v.findViewById(R.id.llTableRow);
-
-            rowList = new ArrayList<>();
         }
     }
 
     public TableAdapter(ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList, Context context,
-                        CoordinatorLayout layout, TableHorizontalScrollView.OnScrollListener listener,
-                        TableHorizontalScrollView headerScrollView){
+                        CoordinatorLayout layout){
         this.tableData = tableData;
         this.columnList = columnList;
         this.layout= layout;
         this.context= context;
-        this.listener = listener;
-        this.headerScrollView = headerScrollView;
-
-        this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public TableAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.element_table_row, parent, false);
         ViewHolder vh = new ViewHolder(v);
-
-        if (vh.rowLayout.getChildCount() >= columnList.size())
-            return vh;
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(320, ViewGroup.LayoutParams.MATCH_PARENT);
-        for(int i=0; i<columnList.size(); i++){
-            View cellView = inflater.inflate(R.layout.element_table_cell, null, false);
-            cellView.setLayoutParams(params);
-            vh.rowLayout.addView(cellView);
-            vh.rowList.add((EditText) cellView.findViewById(R.id.etTableCell));
-        }
-
         return vh;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        holder.rowNo.setText((holder.getAdapterPosition()+1) + ".");
-        holder.scrollView.setOnScrollListener(listener);
+        holder.rowNo.setText((position + 1) + ".");
 
-        Random r = new Random();
-        for(int i=0; i<columnList.size(); i++) {
-            holder.rowList.get(i).setText(tableData.get(position).get(i));
-        }
+        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        holder.rowRecyclerView.setLayoutManager(layoutManager);
+        holder.rowRecyclerView.setHasFixedSize(true);
 
-        holder.scrollView.setScrollX(headerScrollView.getScrollX());
-//        holder.scrollView.setTranslationX(headerScrollView.getTranslationX());
-
-        Log.d(LOG_TAG, "Pos: " + position + ", TranslationX: " + headerScrollView.getTranslationX() + ", ScrollX: " + headerScrollView.getScrollX());
+        TableRowAdapter rowAdapter = new TableRowAdapter(tableData.get(position), context);
+        holder.rowRecyclerView.setAdapter(rowAdapter);
     }
 
     @Override

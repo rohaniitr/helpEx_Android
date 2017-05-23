@@ -235,6 +235,10 @@
     <dimen name="cardview_compat_inset_shadow">1dp</dimen>
     <dimen name="cardview_default_elevation">2dp</dimen>
     <dimen name="cardview_default_radius">2dp</dimen>
+    <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/values/dimens.xml -->
+    <eat-comment/>
+    <dimen name="custom_table_cell_width">150sp</dimen>
+    <dimen name="custom_table_serial_number_width">48sp</dimen>
     <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.1/res/values/values.xml -->
     <eat-comment/>
     <item name="dialog_fixed_height_major" type="dimen">80%</item>

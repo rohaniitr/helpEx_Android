@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-    android:background="@color/custom_table_header_background">
+    android:layout_width="@dimen/custom_table_cell_width" android:layout_height="?attr/actionBarSize"
+    android:id="@+id/rlHeaderCell" android:background="@color/custom_table_header_background">
 
-    <RelativeLayout
-        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize">
+    <ImageView
+        android:layout_width="1sp" android:layout_height="match_parent"
+        android:id="@+id/ivDividerRight" android:layout_alignParentRight="true"
+        android:background="@color/custom_table_header_divider"/>
 
-        <ImageView
-            android:layout_width="1sp" android:layout_height="match_parent"
-            android:id="@+id/ivDividerRight" android:layout_alignParentRight="true"
-            android:background="@color/custom_table_header_divider"/>
+    <ImageView
+        android:layout_width="1sp" android:layout_height="match_parent"
+        android:id="@+id/ivDividerLeft" android:layout_alignParentLeft="true"
+        android:background="@color/custom_table_header_divider"/>
 
-        <ImageView
-            android:layout_width="1sp" android:layout_height="match_parent"
-            android:id="@+id/ivDividerLeft" android:layout_alignParentLeft="true"
-            android:background="@color/custom_table_header_divider"/>
-        
-        <Assets.TextViewGrandHotel
-            android:layout_width="match_parent" android:layout_height="match_parent"
-            android:id="@+id/tvTableHeader" android:textColor="#eeeeee"
-            android:textSize="32sp" android:gravity="center"/>
-
-    </RelativeLayout>
+    <Assets.TextViewGrandHotel
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:id="@+id/tvTableHeader" android:textColor="#eeeeee"
+        android:textSize="32sp" android:gravity="center"/>
 
 </RelativeLayout>

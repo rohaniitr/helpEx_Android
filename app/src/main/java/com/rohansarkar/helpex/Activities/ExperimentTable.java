@@ -32,16 +32,19 @@ import android.widget.Toast;
 
 import com.rohansarkar.helpex.Adapters.NewColumnAdapter;
 import com.rohansarkar.helpex.Adapters.TableAdapter;
+import com.rohansarkar.helpex.Adapters.TableHeaderAdapter;
+import com.rohansarkar.helpex.Adapters.TableRowAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
 import com.rohansarkar.helpex.R;
 
 import org.greenrobot.eventbus.EventBus;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
+import Assets.SmartRecyclerView;
 import Assets.TableHorizontalScrollView;
+import Assets.Util;
 
 /**
  * Created by rohan on 11/5/17.
@@ -49,25 +52,24 @@ import Assets.TableHorizontalScrollView;
 public class ExperimentTable extends AppCompatActivity implements View.OnClickListener{
 
     private static final String LOG_TAG = "ExperimentTable";
-    RecyclerView recyclerView;
-    RecyclerView.Adapter adapter;
-    RecyclerView.LayoutManager layoutManager;
+    SmartRecyclerView recyclerView;
+    RecyclerView headerRecyclerView;
+    RecyclerView.Adapter adapter, headerAdapter;
+    LinearLayoutManager layoutManager, headerLayoutManager;
     CoordinatorLayout layout;
     Toolbar toolbar;
     ImageView overflowMenu;
     TextView toolbarTitle;
     RelativeLayout emptyLayout;   //If NumberOfColumns <= 0
     RelativeLayout tableLayout;   //If NumberOfColumns > 0
-    LinearLayout headerView;
-    TableHorizontalScrollView headerScrollView;
-    TableHorizontalScrollView.OnScrollListener listener;
     ViewGroup headerViewGroup;
 
     DatabaseManager detailsManager;
-    DataExperiment experimentData;
-    ArrayList<String> columnList;
-    ArrayList<ArrayList<String>> tableData;
-    long rowId;
+    DataExperiment experimentData;              //Data about Experiment selected.
+    ArrayList<String> columnList;               //Contains Column List.
+    ArrayList<String> prevColumnList;           //Contains Just Previous Column List. Required while shifting Columns.
+    ArrayList<ArrayList<String>> tableData;     //Contains 2D Table Data.
+    long rowId;                                 //Row ID of the Selected Experiment.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,9 +78,9 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
         init();
         getData();
-        setTableHeader();
         setLayoutVisibility();
         setToolbar();
+        setHeaderRecyclerView(columnList);
         setRecyclerView(tableData, columnList);
     }
 
@@ -109,8 +111,14 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     }
 
     private void setRecyclerView(ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList){
-        adapter = new TableAdapter(tableData, columnList, this, layout, listener, headerScrollView);
+        adapter = new TableAdapter(tableData, columnList, this, layout);
+        recyclerView.computedWidth = getRecyclerWidth();
         recyclerView.setAdapter(adapter);
+    }
+
+    private void setHeaderRecyclerView(ArrayList<String> columnList){
+        headerAdapter = new TableHeaderAdapter(columnList, this);
+        headerRecyclerView.setAdapter(headerAdapter);
     }
 
     /*
@@ -118,16 +126,19 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     * */
 
     private void init(){
-        recyclerView = (RecyclerView) findViewById(R.id.rvExperimentTable);
+        recyclerView = (SmartRecyclerView) findViewById(R.id.rvTable);
         layout= (CoordinatorLayout) findViewById(R.id.clExperimentTable);
         emptyLayout = (RelativeLayout) findViewById(R.id.rlEmptyLayout);
         tableLayout = (RelativeLayout) findViewById(R.id.rlTableLayout);
 
         layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
 
         columnList = new ArrayList<>();
-        tableData = new ArrayList<ArrayList<String>>();
+        prevColumnList = new ArrayList<>();
+        tableData = new ArrayList<>();
 
         emptyLayout.setOnClickListener(this);
 
@@ -135,17 +146,12 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         detailsManager.open();
 
         //Table Header
-        headerViewGroup = (ViewGroup) findViewById(R.id.tableHeader);
-        headerView = (LinearLayout) headerViewGroup.findViewById(R.id.llTableRow);
-
-        listener = new TableHorizontalScrollView.OnScrollListener() {
-            @Override
-            public void onScroll(HorizontalScrollView view, int x, int y) {
-                EventBus.getDefault().post(new Event(view, x, y));
-            }
-        };
-        headerScrollView = (TableHorizontalScrollView) headerViewGroup.findViewById(R.id.hsvTableRow);
-        headerScrollView.setOnScrollListener(listener);
+        headerViewGroup = (ViewGroup) findViewById(R.id.vTableHeader);
+        headerRecyclerView = (RecyclerView) headerViewGroup.findViewById(R.id.rvTableRow);
+        headerLayoutManager = new LinearLayoutManager(this);
+        headerLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        headerRecyclerView.setLayoutManager(headerLayoutManager);
+        headerRecyclerView.setHasFixedSize(true);
     }
 
     private void setToolbar(){
@@ -163,22 +169,6 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
         toolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
         toolbarTitle.setText(experimentData.title);
-    }
-
-    private void setTableHeader(){
-        headerScrollView.removeAllViews();
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(320, ViewGroup.LayoutParams.MATCH_PARENT);
-
-        for(int i=0; i<columnList.size(); i++){
-            View cellView = inflater.inflate(R.layout.element_table_header_cell, null, false);
-            cellView.setLayoutParams(params);
-
-            TextView column = (TextView) cellView.findViewById(R.id.tvTableHeader);
-            column.setText(columnList.get(i));
-
-            headerView.addView(cellView);
-        }
     }
 
     @Override
@@ -318,6 +308,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     //Database APIs
     private void updateColumns(ArrayList<String> columnNames){
         experimentData.columnNames = getColumnString(columnNames);
+        prevColumnList = columnList;
         columnList = columnNames;
         Log.d(LOG_TAG, "columnNames: " + experimentData.columnNames + "columnNames.size : " + columnNames.size());
         detailsManager.updateEntry(experimentData);
@@ -329,8 +320,6 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
     //Updates the Table.
     private void refreshTable(){
-        setTableHeader();
-
         //Body Logic here.
         if(tableData.isEmpty()){
 
@@ -388,6 +377,12 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
             tableLayout.setVisibility(View.GONE);
             emptyLayout.setVisibility(View.VISIBLE);
         }
+    }
+
+    private int getRecyclerWidth(){
+        float sp = getResources().getDimension(R.dimen.custom_table_serial_number_width) +
+                (getResources().getDimension(R.dimen.custom_table_cell_width) * columnList.size());
+        return (int)sp;
     }
 
     //EVENT Class.

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-    android:orientation="horizontal" >
+    android:id="@+id/llTableRow" android:orientation="horizontal" >
 
     <Assets.TextViewGrandHotel
         android:layout_width="48sp" android:layout_height="match_parent"
@@ -10,14 +10,8 @@
         android:background="@color/custom_table_header_background"
         android:textSize="24sp"/>
 
-    <Assets.TableHorizontalScrollView
-        android:id="@+id/hsvTableRow" android:scrollbars="none"
-        android:layout_width="match_parent" android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_width="match_parent" android:layout_height="match_parent"
-            android:id="@+id/llTableRow" android:orientation="horizontal"/>
-
-    </Assets.TableHorizontalScrollView>
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:id="@+id/rvTableRow"/>
 
 </LinearLayout>

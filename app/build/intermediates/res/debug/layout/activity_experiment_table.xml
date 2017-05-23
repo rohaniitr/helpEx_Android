@@ -34,20 +34,25 @@
 
         </android.support.v7.widget.Toolbar>
 
-    <RelativeLayout
+    <HorizontalScrollView
         android:layout_width="match_parent" android:layout_height="match_parent"
-        android:id="@+id/rlTableLayout" android:layout_below="@+id/tbExperimentTable">
+        android:layout_below="@+id/tbExperimentTable" android:fitsSystemWindows="true">
 
-            <include
-                android:id="@+id/tableHeader" layout="@layout/element_table_row"
-                android:layout_height="?attr/actionBarSize" android:layout_width="match_parent"/>
+        <RelativeLayout
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:id="@+id/rlTableLayout" >
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rvExperimentTable"
-                android:layout_width="match_parent" android:layout_height="match_parent"
-                android:nestedScrollingEnabled="true" android:layout_below="@+id/tableHeader"/>
+                <include
+                    android:id="@+id/vTableHeader" layout="@layout/element_table_row"
+                    android:layout_height="?attr/actionBarSize" android:layout_width="match_parent"/>
 
-        </RelativeLayout>
+                <Assets.SmartRecyclerView
+                    android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:id="@+id/rvTable" android:layout_below="@+id/vTableHeader"/>
+
+            </RelativeLayout>
+
+    </HorizontalScrollView>
 
         <RelativeLayout
             android:layout_width="match_parent" android:layout_height="match_parent"

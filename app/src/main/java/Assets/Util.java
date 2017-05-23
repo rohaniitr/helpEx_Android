@@ -1,5 +1,7 @@
 package Assets;
 
+import android.content.Context;
+
 /**
  * Created by rohan on 17/3/17.
  */
@@ -23,5 +25,10 @@ public class Util {
             return value;
         }
     }
+
+    public static int getPixelsFromSP(int sp, Context context){
+        return (int) (sp * context.getResources().getDisplayMetrics().scaledDensity);
+    }
+
 
 }

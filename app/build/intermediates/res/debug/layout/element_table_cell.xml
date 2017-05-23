@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" android:layout_height="?attr/actionBarSize">
-
-    <RelativeLayout
-        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-        android:id="@+id/rlTableCell">
+    android:layout_width="@dimen/custom_table_cell_width" android:layout_height="?attr/actionBarSize"
+    android:id="@+id/rlTableCell">
 
         <ImageView
             android:layout_width="1sp" android:layout_height="match_parent"
@@ -22,13 +19,11 @@
             android:background="@color/custom_table_divider" />
 
         <Assets.EditTextGrandHotel
-            android:layout_width="match_parent" android:layout_height="32sp"
+            android:layout_width="match_parent" android:layout_height="match_parent"
             android:id="@+id/etTableCell" android:layout_centerInParent="true"
             android:layout_marginRight="16sp" android:layout_marginLeft="16sp"
             android:layout_margin="8sp" android:background="@android:color/transparent"
-            android:inputType="numberDecimal" android:gravity="center_horizontal"
+            android:inputType="numberDecimal" android:gravity="left"
             android:textSize="24sp"/>
-
-    </RelativeLayout>
 
 </RelativeLayout><!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/layout/element_table_cell.xml -->
