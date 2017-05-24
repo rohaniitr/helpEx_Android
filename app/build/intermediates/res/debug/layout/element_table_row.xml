@@ -3,13 +3,6 @@
     android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
     android:id="@+id/llTableRow" android:orientation="horizontal" >
 
-    <Assets.TextViewGrandHotel
-        android:layout_width="48sp" android:layout_height="match_parent"
-        android:textColor="#eeeeee" android:paddingLeft="8sp"
-        android:id="@+id/tvTableRowNo" android:gravity="center_vertical"
-        android:background="@color/custom_table_header_background"
-        android:textSize="24sp"/>
-
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent" android:layout_height="match_parent"
         android:id="@+id/rvTableRow"/>

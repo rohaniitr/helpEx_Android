@@ -34,13 +34,23 @@
 
         </android.support.v7.widget.Toolbar>
 
-    <HorizontalScrollView
-        android:layout_width="match_parent" android:layout_height="match_parent"
-        android:layout_below="@+id/tbExperimentTable" android:fitsSystemWindows="true">
+        <ImageView
+            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+            android:id="@+id/ivDummy" android:layout_below="@+id/tbExperimentTable"
+            android:background="@color/custom_table_header_background"/>
 
-        <RelativeLayout
+        <Assets.SmartRecyclerView
+            android:layout_width="wrap_content" android:layout_height="match_parent"
+            android:id="@+id/rvTableNo" android:layout_below="@+id/ivDummy"/>
+
+        <HorizontalScrollView
             android:layout_width="match_parent" android:layout_height="match_parent"
-            android:id="@+id/rlTableLayout" >
+            android:layout_below="@+id/tbExperimentTable" android:fitsSystemWindows="true"
+            android:layout_toRightOf="@+id/rvTableNo">
+
+            <RelativeLayout
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:id="@+id/rlTableLayout" >
 
                 <include
                     android:id="@+id/vTableHeader" layout="@layout/element_table_row"
@@ -52,7 +62,7 @@
 
             </RelativeLayout>
 
-    </HorizontalScrollView>
+        </HorizontalScrollView>
 
         <RelativeLayout
             android:layout_width="match_parent" android:layout_height="match_parent"

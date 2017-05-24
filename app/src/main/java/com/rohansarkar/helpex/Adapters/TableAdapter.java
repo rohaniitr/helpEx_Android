@@ -38,13 +38,11 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder>{
     String LOG_TAG= "TableAdapter Logs";
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        TextView rowNo;
         LinearLayout rowLayout;
         RecyclerView rowRecyclerView;
 
         public ViewHolder(View v) {
             super(v);
-            rowNo = (TextView) v.findViewById(R.id.tvTableRowNo);
             rowRecyclerView = (RecyclerView) v.findViewById(R.id.rvTableRow);
             rowLayout = (LinearLayout) v.findViewById(R.id.llTableRow);
         }
@@ -67,8 +65,6 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        holder.rowNo.setText((position + 1) + ".");
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         holder.rowRecyclerView.setLayoutManager(layoutManager);

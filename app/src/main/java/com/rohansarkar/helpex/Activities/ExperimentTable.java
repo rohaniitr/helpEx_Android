@@ -7,14 +7,15 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -24,7 +25,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.rohansarkar.helpex.Adapters.NewColumnAdapter;
 import com.rohansarkar.helpex.Adapters.TableAdapter;
 import com.rohansarkar.helpex.Adapters.TableHeaderAdapter;
-import com.rohansarkar.helpex.Adapters.TableRowAdapter;
+import com.rohansarkar.helpex.Adapters.TableRowNoAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
 import com.rohansarkar.helpex.R;
@@ -43,8 +43,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.ArrayList;
 
 import Assets.SmartRecyclerView;
-import Assets.TableHorizontalScrollView;
-import Assets.Util;
+import Assets.SmartScrollView;
 
 /**
  * Created by rohan on 11/5/17.
@@ -52,10 +51,11 @@ import Assets.Util;
 public class ExperimentTable extends AppCompatActivity implements View.OnClickListener{
 
     private static final String LOG_TAG = "ExperimentTable";
-    SmartRecyclerView recyclerView;
+    SmartRecyclerView recyclerView, rowRecyclerView;
     RecyclerView headerRecyclerView;
-    RecyclerView.Adapter adapter, headerAdapter;
-    LinearLayoutManager layoutManager, headerLayoutManager;
+    RecyclerView.Adapter adapter, headerAdapter, rowAdapter;
+    LinearLayoutManager layoutManager, headerLayoutManager, rowLayoutManager;
+    RecyclerView.OnScrollListener tableScrollListener, rowNoScrollListener;
     CoordinatorLayout layout;
     Toolbar toolbar;
     ImageView overflowMenu;
@@ -103,7 +103,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         for(int i=0; i<30; i++) {
             ArrayList<String> rowData = new ArrayList<>();
             for(int j=0; j<10; j++)
-                rowData.add(2.34 + "");
+                rowData.add(i + j + "");
             tableData.add(rowData);
         }
 //        experiments = detailsManager.getExperimentDetails();
@@ -114,6 +114,81 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         adapter = new TableAdapter(tableData, columnList, this, layout);
         recyclerView.computedWidth = getRecyclerWidth();
         recyclerView.setAdapter(adapter);
+
+        rowAdapter = new TableRowNoAdapter(tableData.size(), this);
+        rowRecyclerView.computedWidth = (int) getResources().getDimension(R.dimen.custom_table_serial_number_width);
+        rowRecyclerView.setAdapter(rowAdapter);
+
+        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+
+            private int mLastY;
+
+            @Override
+            public boolean onInterceptTouchEvent(@NonNull final RecyclerView rv, @NonNull final
+            MotionEvent e) {
+                final Boolean ret = rv.getScrollState() != RecyclerView.SCROLL_STATE_IDLE;
+                if (!ret) {
+                    onTouchEvent(rv, e);
+                }
+                return Boolean.FALSE;
+            }
+
+            @Override
+            public void onTouchEvent(@NonNull final RecyclerView rv, @NonNull final MotionEvent e) {
+
+                final int action;
+                if ((action = e.getAction()) == MotionEvent.ACTION_DOWN && rowRecyclerView
+                        .getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
+                    mLastY = rv.getScrollY();
+                    rv.addOnScrollListener(rowNoScrollListener);
+                }
+                else {
+                    if (action == MotionEvent.ACTION_UP && rv.getScrollY() == mLastY) {
+                        rv.removeOnScrollListener(rowNoScrollListener);
+                    }
+                }
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(final boolean disallowIntercept) {
+            }
+        });
+
+        rowRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+
+            private int mLastY;
+
+            @Override
+            public boolean onInterceptTouchEvent(@NonNull final RecyclerView rv, @NonNull final
+            MotionEvent e) {
+
+                final Boolean ret = rv.getScrollState() != RecyclerView.SCROLL_STATE_IDLE;
+                if (!ret) {
+                    onTouchEvent(rv, e);
+                }
+                return Boolean.FALSE;
+            }
+
+            @Override
+            public void onTouchEvent(@NonNull final RecyclerView rv, @NonNull final MotionEvent e) {
+
+                final int action;
+                if ((action = e.getAction()) == MotionEvent.ACTION_DOWN && recyclerView
+                        .getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
+                    mLastY = rv.getScrollY();
+                    rv.addOnScrollListener(tableScrollListener);
+                }
+                else {
+                    if (action == MotionEvent.ACTION_UP && rv.getScrollY() == mLastY) {
+                        rv.removeOnScrollListener(tableScrollListener);
+                    }
+                }
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(final boolean disallowIntercept) {
+            }
+        });
     }
 
     private void setHeaderRecyclerView(ArrayList<String> columnList){
@@ -127,6 +202,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
     private void init(){
         recyclerView = (SmartRecyclerView) findViewById(R.id.rvTable);
+        rowRecyclerView = (SmartRecyclerView) findViewById(R.id.rvTableNo);
         layout= (CoordinatorLayout) findViewById(R.id.clExperimentTable);
         emptyLayout = (RelativeLayout) findViewById(R.id.rlEmptyLayout);
         tableLayout = (RelativeLayout) findViewById(R.id.rlTableLayout);
@@ -135,6 +211,11 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
+
+        rowLayoutManager = new LinearLayoutManager(this);
+        rowLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        rowRecyclerView.setLayoutManager(rowLayoutManager);
+        rowRecyclerView.setHasFixedSize(true);
 
         columnList = new ArrayList<>();
         prevColumnList = new ArrayList<>();
@@ -152,6 +233,22 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         headerLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         headerRecyclerView.setLayoutManager(headerLayoutManager);
         headerRecyclerView.setHasFixedSize(true);
+
+        //Table Scroll Listener.
+        tableScrollListener = new SmartScrollView() {
+            @Override
+            public void onScrolled(@NonNull final RecyclerView recyclerView, final int dx, final int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                recyclerView.scrollBy(dx, dy);
+            }
+        };
+        rowNoScrollListener = new SmartScrollView() {
+            @Override
+            public void onScrolled(@NonNull final RecyclerView recyclerView, final int dx, final int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                rowRecyclerView.scrollBy(dx, dy);
+            }
+        };
     }
 
     private void setToolbar(){
@@ -320,16 +417,53 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
     //Updates the Table.
     private void refreshTable(){
-        //Body Logic here.
-        if(tableData.isEmpty()){
+        ArrayList<ArrayList<String>> tempTableData = new ArrayList<>(tableData.size());
 
-        }
-
-        for(int i=0; i<tableData.size(); i++){
-            for(int j= tableData.get(i).size(); j<columnList.size(); j++){
-
+        for(int i=0; i<columnList.size(); i++){
+            if(tempTableData.isEmpty()) {
+                //First Element of Each Row.
+                if (prevColumnList.contains(columnList.get(i))) {
+                    //Move the Column Data.
+                    //Get position of Column in Prev Table Arrangement.
+                    int columnPos = prevColumnList.indexOf(columnList.get(i));
+                    ArrayList<String> data = null;
+                    //Copy Prev Column Data to new Position.
+                    for (int j = 0; j < tableData.size(); j++) {
+                        data = new ArrayList<>();
+                        data.add(tableData.get(j).get(columnPos));
+                        tempTableData.add(data);
+                    }
+                } else {
+                    //Initialise Empty Values.
+                    ArrayList<String> data = null;
+                    for (int j = 0; j < tableData.size(); j++) {
+                        data = new ArrayList<>();
+                        data.add("");
+                        tempTableData.add(data);
+                    }
+                }
+            }
+            else {
+                //For  Rest of elements.
+                if (prevColumnList.contains(columnList.get(i))) {
+                    int columnPos = prevColumnList.indexOf(columnList.get(i));
+                    //Copy Prev Values to new Position.
+                    for (int j = 0; j < tableData.size(); j++)
+                        tempTableData.get(j).add(tableData.get(j).get(columnPos));
+                }
+                else {
+                    //Assign Empty Values
+                    for (int j = 0; j < tableData.size(); j++)
+                        tempTableData.get(j).add("");
+                }
             }
         }
+
+        //Free Memory & Update UI.
+        tableData.clear();
+        tableData = tempTableData;
+        setRecyclerView(tableData, columnList);
+        setHeaderRecyclerView(columnList);
 
         //Update Database for Table  Data.
     }
@@ -380,8 +514,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     }
 
     private int getRecyclerWidth(){
-        float sp = getResources().getDimension(R.dimen.custom_table_serial_number_width) +
-                (getResources().getDimension(R.dimen.custom_table_cell_width) * columnList.size());
+        float sp = (getResources().getDimension(R.dimen.custom_table_cell_width) * columnList.size());
         return (int)sp;
     }
 

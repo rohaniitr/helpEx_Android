@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+    android:id="@+id/llTableRowNo" android:orientation="horizontal" >
+
+    <Assets.TextViewGrandHotel
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:textColor="#eeeeee" android:paddingLeft="8sp"
+        android:id="@+id/tvTableRowNo" android:gravity="center_vertical"
+        android:background="@color/custom_table_header_background"
+        android:textSize="24sp"/>
+
+</LinearLayout><!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/layout/element_table_row_no.xml -->

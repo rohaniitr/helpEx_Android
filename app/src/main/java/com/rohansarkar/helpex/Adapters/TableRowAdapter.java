@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rohansarkar.helpex.R;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
  * Created by rohan on 23/5/17.
  */
 public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.ViewHolder>{
-    private ArrayList<String> headerValues;
+    private ArrayList<String> cellValues;
     private Context context;
 
     String LOG_TAG= this.getClass().getSimpleName();
@@ -35,7 +34,7 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.ViewHo
     }
 
     public TableRowAdapter(ArrayList<String> cellValues, Context context){
-        this.headerValues = cellValues;
+        this.cellValues = cellValues;
         this.context= context;
     }
 
@@ -48,12 +47,12 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        holder.cell.setText(headerValues.get(position));
+        holder.cell.setText(cellValues.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return headerValues.size();
+        return cellValues.size();
     }
 
     /*
