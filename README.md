@@ -16,11 +16,11 @@ The functionalities in the app are:
 </p>
 
 <p align="center">
-  <img src="Extras/splash_screen.jpg" height="550" width="280"/> 
-  <img src="Extras/Home.jpg" height="550" width="280"/> 
-  <img src="Extras/New Experiment Dialog.jpg" height="550" width="280"/> 
+  <img src="Extras/splash_screen.jpg" height="480" width="280"/> 
+  <img src="Extras/Home.jpg" height="480" width="280"/> 
+  <img src="Extras/New Experiment Dialog.jpg" height="480" width="280"/> 
 </p>
 <p align="center">
-  <img src="Extras/Table Horizontal Scrolling.jpg" height="550" width="280"/> 
-  <img src="Extras/Table Vertical Scrolling.jpg" height="550" width="280"/> 
+  <img src="Extras/Table Horizontal Scrolling.jpg" height="480" width="280"/> 
+  <img src="Extras/Table Vertical Scrolling.jpg" height="480" width="280"/> 
 </p>
