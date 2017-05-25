@@ -55,6 +55,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     CoordinatorLayout layout;
     Toolbar toolbar;
     ImageView overflowMenu;
+    ImageView headerPadding;
     TextView toolbarTitle;
     RelativeLayout emptyLayout;   //If NumberOfColumns <= 0
     RelativeLayout tableLayout;   //If NumberOfColumns > 0
@@ -131,6 +132,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         layout= (CoordinatorLayout) findViewById(R.id.clExperimentTable);
         emptyLayout = (RelativeLayout) findViewById(R.id.rlEmptyLayout);
         tableLayout = (RelativeLayout) findViewById(R.id.rlTableLayout);
+        headerPadding = (ImageView) findViewById(R.id.ivHeaderPadding);
 
         tableLayoutManager = new LinearLayoutManager(this);
         tableLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -441,10 +443,14 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     private void setLayoutVisibility(){
         if(columnList.size()>0){
             tableLayout.setVisibility(View.VISIBLE);
+            rowRecyclerView.setVisibility(View.VISIBLE);
+            headerPadding.setVisibility(View.VISIBLE);
             emptyLayout.setVisibility(View.GONE);
         }
         else{
             tableLayout.setVisibility(View.GONE);
+            rowRecyclerView.setVisibility(View.GONE);
+            headerPadding.setVisibility(View.GONE);
             emptyLayout.setVisibility(View.VISIBLE);
         }
     }

@@ -35,7 +35,7 @@
         </android.support.v7.widget.Toolbar>
 
         <ImageView
-            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+            android:layout_width="@dimen/custom_table_serial_number_width" android:layout_height="?attr/actionBarSize"
             android:id="@+id/ivHeaderPadding" android:layout_below="@+id/tbExperimentTable"
             android:background="@color/custom_table_header_background"/>
 
