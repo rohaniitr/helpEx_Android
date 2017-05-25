@@ -3,11 +3,11 @@ package com.rohansarkar.helpex.Activities;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,7 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -38,12 +37,9 @@ import com.rohansarkar.helpex.CustomData.DataExperiment;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
 import com.rohansarkar.helpex.R;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.ArrayList;
 
 import Assets.SmartRecyclerView;
-import Assets.SmartScrollView;
 
 /**
  * Created by rohan on 11/5/17.
@@ -51,11 +47,11 @@ import Assets.SmartScrollView;
 public class ExperimentTable extends AppCompatActivity implements View.OnClickListener{
 
     private static final String LOG_TAG = "ExperimentTable";
-    SmartRecyclerView recyclerView, rowRecyclerView;
+    SmartRecyclerView tableRecyclerView, rowRecyclerView;
     RecyclerView headerRecyclerView;
-    RecyclerView.Adapter adapter, headerAdapter, rowAdapter;
-    LinearLayoutManager layoutManager, headerLayoutManager, rowLayoutManager;
-    RecyclerView.OnScrollListener tableScrollListener, rowNoScrollListener;
+    RecyclerView.Adapter tableAdapter, headerAdapter, rowAdapter;
+    LinearLayoutManager tableLayoutManager, headerLayoutManager, rowLayoutManager;
+    RecyclerView.OnScrollListener rvScrollListener;
     CoordinatorLayout layout;
     Toolbar toolbar;
     ImageView overflowMenu;
@@ -111,84 +107,13 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     }
 
     private void setRecyclerView(ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList){
-        adapter = new TableAdapter(tableData, columnList, this, layout);
-        recyclerView.computedWidth = getRecyclerWidth();
-        recyclerView.setAdapter(adapter);
+        tableAdapter = new TableAdapter(tableData, columnList, this, layout);
+        tableRecyclerView.computedWidth = getRecyclerWidth();
+        tableRecyclerView.setAdapter(tableAdapter);
 
         rowAdapter = new TableRowNoAdapter(tableData.size(), this);
         rowRecyclerView.computedWidth = (int) getResources().getDimension(R.dimen.custom_table_serial_number_width);
         rowRecyclerView.setAdapter(rowAdapter);
-
-        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-
-            private int mLastY;
-
-            @Override
-            public boolean onInterceptTouchEvent(@NonNull final RecyclerView rv, @NonNull final
-            MotionEvent e) {
-                final Boolean ret = rv.getScrollState() != RecyclerView.SCROLL_STATE_IDLE;
-                if (!ret) {
-                    onTouchEvent(rv, e);
-                }
-                return Boolean.FALSE;
-            }
-
-            @Override
-            public void onTouchEvent(@NonNull final RecyclerView rv, @NonNull final MotionEvent e) {
-
-                final int action;
-                if ((action = e.getAction()) == MotionEvent.ACTION_DOWN && rowRecyclerView
-                        .getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
-                    mLastY = rv.getScrollY();
-                    rv.addOnScrollListener(rowNoScrollListener);
-                }
-                else {
-                    if (action == MotionEvent.ACTION_UP && rv.getScrollY() == mLastY) {
-                        rv.removeOnScrollListener(rowNoScrollListener);
-                    }
-                }
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(final boolean disallowIntercept) {
-            }
-        });
-
-        rowRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-
-            private int mLastY;
-
-            @Override
-            public boolean onInterceptTouchEvent(@NonNull final RecyclerView rv, @NonNull final
-            MotionEvent e) {
-
-                final Boolean ret = rv.getScrollState() != RecyclerView.SCROLL_STATE_IDLE;
-                if (!ret) {
-                    onTouchEvent(rv, e);
-                }
-                return Boolean.FALSE;
-            }
-
-            @Override
-            public void onTouchEvent(@NonNull final RecyclerView rv, @NonNull final MotionEvent e) {
-
-                final int action;
-                if ((action = e.getAction()) == MotionEvent.ACTION_DOWN && recyclerView
-                        .getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
-                    mLastY = rv.getScrollY();
-                    rv.addOnScrollListener(tableScrollListener);
-                }
-                else {
-                    if (action == MotionEvent.ACTION_UP && rv.getScrollY() == mLastY) {
-                        rv.removeOnScrollListener(tableScrollListener);
-                    }
-                }
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(final boolean disallowIntercept) {
-            }
-        });
     }
 
     private void setHeaderRecyclerView(ArrayList<String> columnList){
@@ -201,16 +126,16 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     * */
 
     private void init(){
-        recyclerView = (SmartRecyclerView) findViewById(R.id.rvTable);
+        tableRecyclerView = (SmartRecyclerView) findViewById(R.id.rvTable);
         rowRecyclerView = (SmartRecyclerView) findViewById(R.id.rvTableNo);
         layout= (CoordinatorLayout) findViewById(R.id.clExperimentTable);
         emptyLayout = (RelativeLayout) findViewById(R.id.rlEmptyLayout);
         tableLayout = (RelativeLayout) findViewById(R.id.rlTableLayout);
 
-        layoutManager = new LinearLayoutManager(this);
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
+        tableLayoutManager = new LinearLayoutManager(this);
+        tableLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        tableRecyclerView.setLayoutManager(tableLayoutManager);
+        tableRecyclerView.setHasFixedSize(true);
 
         rowLayoutManager = new LinearLayoutManager(this);
         rowLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -235,20 +160,30 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         headerRecyclerView.setHasFixedSize(true);
 
         //Table Scroll Listener.
-        tableScrollListener = new SmartScrollView() {
+        rvScrollListener = new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(@NonNull final RecyclerView recyclerView, final int dx, final int dy) {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                recyclerView.scrollBy(dx, dy);
+
+                if(recyclerView == tableRecyclerView){
+                    //Remove ScrollListener from other RecyclerView before programatically Scrolling.
+                    //Else, will end up in LOOP.
+                    rowRecyclerView.removeOnScrollListener(this);
+                    //Scroll other RecyclerView
+                    rowRecyclerView.scrollBy(dx, dy);
+                    //Put the Listener back.
+                    rowRecyclerView.addOnScrollListener(this);
+                }
+                else if(recyclerView == rowRecyclerView){
+                    //Comments same as above.
+                    tableRecyclerView.removeOnScrollListener(this);
+                    tableRecyclerView.scrollBy(dx, dy);
+                    tableRecyclerView.addOnScrollListener(this);
+                }
             }
         };
-        rowNoScrollListener = new SmartScrollView() {
-            @Override
-            public void onScrolled(@NonNull final RecyclerView recyclerView, final int dx, final int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                rowRecyclerView.scrollBy(dx, dy);
-            }
-        };
+        tableRecyclerView.addOnScrollListener(rvScrollListener);
+        rowRecyclerView.addOnScrollListener(rvScrollListener);
     }
 
     private void setToolbar(){
@@ -269,7 +204,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick(final View view) {
         switch(view.getId()){
             case R.id.ivOverflowMenu:
                 //Inflate and Show Toolbar popup.
@@ -282,7 +217,8 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                             launchNewColumnDialog();
                         }
                         else if(menuItem.getItemId() == R.id.popup_plot_graph){
-                            showToast("Plot Graph");
+                            Intent iPlotGraph = new Intent(view.getContext(), PlotGraph.class);
+                            startActivity(iPlotGraph);
                         }
                         else if(menuItem.getItemId() == R.id.popup_export_details){
                             showToast("Export Details");
@@ -309,7 +245,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
     private void setRecyclerView(Dialog dialog, RecyclerView dialogRecyclelrView, RecyclerView.Adapter dialogAdapter,
                                  ArrayList<String> columnNames, RelativeLayout dialogLayout){
-        dialogAdapter = new NewColumnAdapter(columnNames, dialog.getContext(), dialogLayout, recyclerView);
+        dialogAdapter = new NewColumnAdapter(columnNames, dialog.getContext(), dialogLayout, tableRecyclerView);
         dialogRecyclelrView.setAdapter(dialogAdapter);
     }
 
@@ -399,7 +335,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     }
     private void hideKeyboard(){
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(tableRecyclerView.getWindowToken(), 0);
     }
 
     //Database APIs

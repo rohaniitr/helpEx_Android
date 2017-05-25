@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        android:id="@+id/tbPlotGraph" android:background="@color/custom_primary_color"
+        android:backgroundTint="@color/custom_dialog_divider" app:layout_collapseMode="pin"
+        android:elevation="20sp">
+
+        <RelativeLayout
+            android:layout_width="match_parent" android:layout_height="match_parent">
+
+            <Assets.TextViewGrandHotel
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:id="@+id/tvToolbarTitle" android:layout_centerVertical="true"
+                android:textColor="#dddddd" android:textSize="32sp"
+                android:layout_alignParentLeft="true" android:ellipsize="end"
+                android:singleLine="true"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_height="match_parent" android:layout_width="match_parent"
+        android:id="@+id/rvPlotGraph"/>
+
+</LinearLayout>

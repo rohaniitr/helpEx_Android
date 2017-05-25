@@ -36,12 +36,12 @@
 
         <ImageView
             android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-            android:id="@+id/ivDummy" android:layout_below="@+id/tbExperimentTable"
+            android:id="@+id/ivHeaderPadding" android:layout_below="@+id/tbExperimentTable"
             android:background="@color/custom_table_header_background"/>
 
         <Assets.SmartRecyclerView
             android:layout_width="wrap_content" android:layout_height="match_parent"
-            android:id="@+id/rvTableNo" android:layout_below="@+id/ivDummy"/>
+            android:id="@+id/rvTableNo" android:layout_below="@+id/ivHeaderPadding"/>
 
         <HorizontalScrollView
             android:layout_width="match_parent" android:layout_height="match_parent"

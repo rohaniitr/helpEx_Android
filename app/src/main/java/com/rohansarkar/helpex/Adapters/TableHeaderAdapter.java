@@ -1,15 +1,10 @@
 package com.rohansarkar.helpex.Adapters;
 
 import android.content.Context;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,9 +12,6 @@ import android.widget.Toast;
 import com.rohansarkar.helpex.R;
 
 import java.util.ArrayList;
-import java.util.Random;
-
-import Assets.TableHorizontalScrollView;
 
 /**
  * Created by rohan on 23/5/17.

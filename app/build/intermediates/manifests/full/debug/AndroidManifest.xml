@@ -32,6 +32,9 @@
         <activity
             android:name="com.rohansarkar.helpex.Activities.ExperimentTable"
             android:label="@string/app_name" />
+        <activity
+            android:name="com.rohansarkar.helpex.Activities.PlotGraph"
+            android:label="@string/app_name" />
 
         <!-- Include the AdActivity and InAppPurchaseActivity configChanges and themes. -->
         <activity

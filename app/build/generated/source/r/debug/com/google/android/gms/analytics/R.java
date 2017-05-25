@@ -11,9 +11,9 @@ public final class R {
 		public static final int adSize = 0x7f01001f;
 		public static final int adSizes = 0x7f010020;
 		public static final int adUnitId = 0x7f010021;
-		public static final int circleCrop = 0x7f010058;
-		public static final int imageAspectRatio = 0x7f010057;
-		public static final int imageAspectRatioAdjust = 0x7f010056;
+		public static final int circleCrop = 0x7f01005c;
+		public static final int imageAspectRatio = 0x7f01005b;
+		public static final int imageAspectRatioAdjust = 0x7f01005a;
 	}
 	public static final class color {
 		public static final int common_action_bar_splitter = 0x7f0b0016;
@@ -120,7 +120,7 @@ public final class R {
 		public static final int AdsAttrs_adSize = 0;
 		public static final int AdsAttrs_adSizes = 1;
 		public static final int AdsAttrs_adUnitId = 2;
-		public static final int[] LoadingImageView = { 0x7f010056, 0x7f010057, 0x7f010058 };
+		public static final int[] LoadingImageView = { 0x7f01005a, 0x7f01005b, 0x7f01005c };
 		public static final int LoadingImageView_circleCrop = 2;
 		public static final int LoadingImageView_imageAspectRatio = 1;
 		public static final int LoadingImageView_imageAspectRatioAdjust = 0;

@@ -32,6 +32,8 @@ MERGED from com.google.android.gms:play-services-base:7.8.0:20:5
 MERGED from com.android.support:support-v4:24.0.0:25:5
 MERGED from com.android.support:cardview-v7:21.0.3:16:5
 MERGED from com.android.support:support-v4:24.0.0:25:5
+MERGED from com.jjoe64:graphview:4.2.1:11:5
+MERGED from com.android.support:support-v4:24.0.0:25:5
 	android:label
 		ADDED from AndroidManifest.xml:8:9
 	android:allowBackup
@@ -68,6 +70,12 @@ ADDED from AndroidManifest.xml:23:9
 		ADDED from AndroidManifest.xml:24:56
 	android:name
 		ADDED from AndroidManifest.xml:24:13
+activity#com.rohansarkar.helpex.Activities.PlotGraph
+ADDED from AndroidManifest.xml:26:9
+	android:label
+		ADDED from AndroidManifest.xml:27:50
+	android:name
+		ADDED from AndroidManifest.xml:27:13
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.android.support:appcompat-v7:22.2.1:20:5
@@ -87,6 +95,8 @@ MERGED from com.google.android.gms:play-services-base:7.8.0:18:5
 MERGED from com.android.support:support-v4:24.0.0:21:5
 MERGED from com.android.support:cardview-v7:21.0.3:15:5
 MERGED from com.android.support:recyclerview-v7:24.0.0:20:5
+MERGED from com.android.support:support-v4:24.0.0:21:5
+MERGED from com.jjoe64:graphview:4.2.1:7:5
 MERGED from com.android.support:support-v4:24.0.0:21:5
 	android:targetSdkVersion
 		INJECTED from AndroidManifest.xml:0:0
