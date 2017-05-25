@@ -1,6 +1,7 @@
 ## helpEx for Android
 
 <img src="Extras/splash_screen.jpg" width="320" height="550" align="middle">
+<img src="Extras/splash_screen.jpg" height="550" width="320"/> <img src="Extras/Home.jpg" height="550" width="320"/> 
 
 This project is an Android application for assisting students in recording their Experimental Data, usually for _Academic purposes_.
 
