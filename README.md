@@ -16,12 +16,12 @@ The functionalities in the app are:
 </p>
 
 <p align="center">
-  <img src="Extras/Screenshots/splash_screen.png" height="480" width="280"/> 
-  <img src="Extras/Screenshots/home.png" height="480" width="280"/> 
-  <img src="Extras/Screenshots/new_experiment Dialog.png" height="480" width="280"/> 
+  <img src="Extras/Screenshots/splash_screen.jpg" height="480" width="280"/> 
+  <img src="Extras/Screenshots/home.jpg" height="480" width="280"/> 
+  <img src="Extras/Screenshots/new_experiment Dialog.jpg" height="480" width="280"/> 
 </p>
 <p align="center">
-  <img src="Extras/Screenshots/table_horizontal_scrolling.png" height="480" width="280"/> 
-  <img src="Extras/Screenshots/table_vertical_scrolling.png" height="480" width="280"/> 
-  <img src="Extras/Screenshots/plot_graph.png" height="480" width="280"/> 
+  <img src="Extras/Screenshots/table_horizontal_scrolling.jpg" height="480" width="280"/> 
+  <img src="Extras/Screenshots/table_vertical_scrolling.jpg" height="480" width="280"/> 
+  <img src="Extras/Screenshots/plot_graph.jpg" height="480" width="280"/> 
 </p>
