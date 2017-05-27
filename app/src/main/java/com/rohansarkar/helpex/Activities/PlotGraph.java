@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.data.Entry;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.rohansarkar.helpex.Adapters.PlotGraphAdapter;
@@ -41,7 +42,8 @@ public class PlotGraph extends AppCompatActivity{
     TextView toolbarTitle;
 
     private ArrayList<String> titles;
-    private ArrayList<LineGraphSeries<DataPoint>> series;
+    private ArrayList<ArrayList<String>> xValues;
+    private ArrayList<ArrayList<Entry>> yValues;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,42 +53,43 @@ public class PlotGraph extends AppCompatActivity{
         init();
         getData();
         setToolbar();
-        setRecyclerView(series, titles);
+        setRecyclerView(yValues, xValues, titles);
     }
 
     private void getData(){
         Random r = new Random();
 
-        LineGraphSeries<DataPoint> data1 = new LineGraphSeries<>();
-        for(int i=0; i<15; i++)
-            data1.appendData(new DataPoint(i, Math.sin(i)),  true, 15);
-        series.add(data1);
+        ArrayList<String> xData = new ArrayList<>();
+        ArrayList<Entry> yData = new ArrayList<>();
+        for(int i=0; i<100; i++) {
+            xData.add(i+"");
+            yData.add(new Entry((float)Math.sin(i), i));
+        }
+        xValues.add(xData);
+        yValues.add(yData);
 
-        LineGraphSeries<DataPoint> data2 = new LineGraphSeries<>();
-        for(int i=0; i<15; i++)
-            data2.appendData(new DataPoint(i, r.nextInt(1000) + (i*i)),  true, 15);
-        series.add(data2);
+        ArrayList<String> x = new ArrayList<>();
+        for(int i=0; i<20; i++){
+            x.add(i+"");
+        }
 
-        LineGraphSeries<DataPoint> data3 = new LineGraphSeries<>();
-        for(int i=0; i<15; i++)
-            data3.appendData(new DataPoint(i, r.nextInt(1000) +  (i*i*i) + (i*i)),  true, 15);
-        series.add(data3);
-
-        LineGraphSeries<DataPoint> data4 = new LineGraphSeries<>();
-        for(int i=0; i<15; i++)
-            data4.appendData(new DataPoint(i, r.nextInt(1000)),  true, 15);
-        series.add(data4);
-
-        LineGraphSeries<DataPoint> data5 = new LineGraphSeries<>();
-        for(int i=0; i<15; i++)
-            data5.appendData(new DataPoint(i, r.nextInt(100)),  true, 15);
-        series.add(data5);
+        for(int i=0; i<5; i++){
+            ArrayList<Entry> y = new ArrayList<>();
+            int val = 10;
+            for(int j=0; j<20; j++){
+                y.add(new Entry(r.nextInt(val) + r.nextFloat(), j));
+            }
+            yValues.add(y);
+            xValues.add(x);
+            val = val*10;
+        }
 
         titles.add("X vs Theta");
         titles.add("Alpha vs Gamma");
         titles.add("Beta vs Y");
         titles.add("Y vs Alpha");
         titles.add("sin(Theta) vs Gamma");
+        titles.add("Woff vs Meow");
     }
 
     private void init(){
@@ -97,12 +100,14 @@ public class PlotGraph extends AppCompatActivity{
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
 
-        series = new ArrayList<>();
+        yValues = new ArrayList<>();
+        xValues = new ArrayList<>();
         titles = new ArrayList<>();
     }
 
-    private void setRecyclerView(ArrayList<LineGraphSeries<DataPoint>> series, ArrayList<String> titles){
-        adapter = new PlotGraphAdapter(series, titles, this);
+    private void setRecyclerView(ArrayList<ArrayList<Entry>> yValues, ArrayList<ArrayList<String>> xValues,
+                                 ArrayList<String> titles){
+        adapter = new PlotGraphAdapter(yValues, xValues, titles, this);
         recyclerView.setAdapter(adapter);
     }
 

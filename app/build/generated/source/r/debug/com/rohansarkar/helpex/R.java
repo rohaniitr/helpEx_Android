@@ -2350,7 +2350,6 @@ containing a value of this type.
         public static final int fill_horizontal=0x7f0c0023;
         public static final int fill_vertical=0x7f0c0024;
         public static final int fixed=0x7f0c0035;
-        public static final int gvPlotGraph=0x7f0c0090;
         public static final int home=0x7f0c0004;
         public static final int homeAsUp=0x7f0c000f;
         public static final int icon=0x7f0c0045;
@@ -2367,6 +2366,7 @@ containing a value of this type.
         public static final int ivOverflowMenu=0x7f0c006b;
         public static final int ivRemove=0x7f0c008e;
         public static final int ivStar=0x7f0c0088;
+        public static final int lcPlotGraph=0x7f0c0090;
         public static final int left=0x7f0c0025;
         public static final int line1=0x7f0c00a3;
         public static final int line3=0x7f0c00a7;

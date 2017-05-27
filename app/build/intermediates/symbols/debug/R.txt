@@ -660,7 +660,6 @@ int id fill 0x7f0c0022
 int id fill_horizontal 0x7f0c0023
 int id fill_vertical 0x7f0c0024
 int id fixed 0x7f0c0035
-int id gvPlotGraph 0x7f0c0090
 int id home 0x7f0c0004
 int id homeAsUp 0x7f0c000f
 int id icon 0x7f0c0045
@@ -677,6 +676,7 @@ int id ivHeaderPadding 0x7f0c006d
 int id ivOverflowMenu 0x7f0c006b
 int id ivRemove 0x7f0c008e
 int id ivStar 0x7f0c0088
+int id lcPlotGraph 0x7f0c0090
 int id left 0x7f0c0025
 int id line1 0x7f0c00a3
 int id line3 0x7f0c00a7

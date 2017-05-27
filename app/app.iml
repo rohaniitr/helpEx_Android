@@ -84,6 +84,7 @@
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="design-22.2.1" level="project" />
+    <orderEntry type="library" exported="" name="mpandroidchartlibrary-2-2-4" level="project" />
     <orderEntry type="library" exported="" name="graphview-4.2.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-appindexing-7.8.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-24.0.0" level="project" />

@@ -14,9 +14,9 @@
             android:textColor="#eeeeee" android:textSize="32sp"
             android:background="@color/custom_dialog_button_background"/>
 
-        <com.jjoe64.graphview.GraphView
+        <com.github.mikephil.charting.charts.LineChart
             android:layout_height="match_parent" android:layout_width="match_parent"
-            android:id="@+id/gvPlotGraph" android:layout_margin="8sp"/>
+            android:id="@+id/lcPlotGraph" android:layout_margin="8sp"/>
 
     </LinearLayout>
 
