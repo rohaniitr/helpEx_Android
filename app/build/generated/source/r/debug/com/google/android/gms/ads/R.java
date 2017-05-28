@@ -26,8 +26,8 @@ public final class R {
 		public static final int common_signin_btn_light_text_disabled = 0x7f0b001d;
 		public static final int common_signin_btn_light_text_focused = 0x7f0b001e;
 		public static final int common_signin_btn_light_text_pressed = 0x7f0b001f;
-		public static final int common_signin_btn_text_dark = 0x7f0b0061;
-		public static final int common_signin_btn_text_light = 0x7f0b0062;
+		public static final int common_signin_btn_text_dark = 0x7f0b0062;
+		public static final int common_signin_btn_text_light = 0x7f0b0063;
 	}
 	public static final class drawable {
 		public static final int common_full_open_on_phone = 0x7f02003b;
@@ -109,8 +109,8 @@ public final class R {
 		public static final int create_calendar_message = 0x7f060036;
 		public static final int create_calendar_title = 0x7f060037;
 		public static final int decline = 0x7f060038;
-		public static final int store_picture_message = 0x7f06003a;
-		public static final int store_picture_title = 0x7f06003b;
+		public static final int store_picture_message = 0x7f06003b;
+		public static final int store_picture_title = 0x7f06003c;
 	}
 	public static final class style {
 		public static final int Theme_IAPTheme = 0x7f0800ea;

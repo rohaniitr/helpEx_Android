@@ -54,6 +54,7 @@
     <color name="custom_accent_color">#888888</color>
     <color name="custom_dialog_button_background">#1a7ba3</color>
     <color name="custom_dialog_divider">#1a7ba3</color>
+    <color name="custom_dialog_hint">#aaaaaa</color>
     <color name="custom_dialog_title_text">#219bce</color>
     <color name="custom_drawer_icon">#44bb44</color>
     <color name="custom_drawer_text">#666666</color>
@@ -393,6 +394,9 @@
     <string name="create_calendar_message">Allow Ad to create a calendar event?</string>
     <string name="create_calendar_title">Create calendar event</string>
     <string name="decline">Decline</string>
+    <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="plot_graph_help">Please select two columns form below to plot graph. \n First column selected will be X-axis by default.</string>
     <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.1/res/values/values.xml -->
     <eat-comment/>
     <string name="status_bar_notification_info_overflow">999+</string>

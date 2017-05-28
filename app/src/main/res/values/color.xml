@@ -15,6 +15,7 @@
     <color name="custom_dialog_title_text">#219bce</color>
     <color name="custom_dialog_divider">#1a7ba3</color>
     <color name="custom_dialog_button_background">#1a7ba3</color>
+    <color name="custom_dialog_hint">#aaaaaa</color>
 
     <color name="custom_table_divider">#551a7ba3</color>
     <color name="custom_table_header_divider">#eeeeeeee</color>

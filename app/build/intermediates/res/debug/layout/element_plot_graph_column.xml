@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        android:paddingLeft="16sp" android:paddingRight="16sp"
+        android:background="@color/custom_dialog_button_background" android:id="@id/rlToolbar">
+
+        <ImageView
+            android:layout_width="32sp" android:layout_height="32sp"
+            android:id="@+id/ivBack" android:layout_centerVertical="true"
+            android:background="@drawable/abc_ic_ab_back_mtrl_am_alpha" android:tint="#eeeeee"/>
+
+        <Assets.EditTextGrandHotel
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:text="Plot Graphs. . ." android:textColor="#eeeeee"/>
+
+    </RelativeLayout>
+
+    <Assets.TextViewCaviarDreams
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:id="@+id/tvHint" android:text="@string/plot_graph_help"
+        android:textSize="12sp" android:textColor="@color/custom_dialog_hint"
+        android:layout_below="@+id/rlToolbar"/>
+
+    
+
+</RelativeLayout><!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/layout/element_plot_graph_column.xml -->

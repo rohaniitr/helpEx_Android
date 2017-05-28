@@ -3,4 +3,7 @@
 
     <string name="app_name">helpEx</string>
 
+    <string name="plot_graph_empty">No Graphs for Plotting. \n\n Please select two columns from  above list to plot a Graph.</string>
+    <string name="plot_graph_help">Please select two columns form below to plot graph. \n First column selected will be X-axis by default.</string>
+
 </resources>
