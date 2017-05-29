@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+    android:padding="8sp">
+
+    <Assets.TextViewCaviarDreams
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:id="@+id/tvGraphColumns" android:layout_centerVertical="true"
+        android:textSize="20sp" android:layout_toLeftOf="@+id/ivCross"
+        android:paddingLeft="16sp"/>
+
+    <ImageView
+        android:layout_width="32sp" android:layout_height="32sp"
+        android:id="@+id/ivCross" android:scaleType="fitCenter"
+        android:src="@drawable/cross" android:background="@drawable/opaque_circle"
+        android:backgroundTint="#41b231" android:tint="#eeeeee"
+        android:layout_alignParentRight="true" android:layout_centerVertical="true"
+        android:elevation="8sp" android:layout_marginRight="16sp"/>
+
+    <ImageView
+        android:layout_width="match_parent" android:layout_height="1sp"
+        android:background="@color/custom_dialog_button_background" android:layout_alignParentBottom="true"/>
+
+</RelativeLayout><!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/layout/element_graph_list.xml -->

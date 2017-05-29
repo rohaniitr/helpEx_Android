@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,16 +25,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.rohansarkar.helpex.Adapters.GraphListAdapter;
+import com.rohansarkar.helpex.Adapters.GraphSelectAdapter;
 import com.rohansarkar.helpex.Adapters.NewColumnAdapter;
 import com.rohansarkar.helpex.Adapters.TableAdapter;
 import com.rohansarkar.helpex.Adapters.TableHeaderAdapter;
 import com.rohansarkar.helpex.Adapters.TableRowNoAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
+import com.rohansarkar.helpex.CustomData.DataSelectColumn;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
 import com.rohansarkar.helpex.R;
 
@@ -219,8 +224,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                             launchNewColumnDialog();
                         }
                         else if(menuItem.getItemId() == R.id.popup_plot_graph){
-                            Intent iPlotGraph = new Intent(view.getContext(), PlotGraph.class);
-                            startActivity(iPlotGraph);
+                            launchPlotGraohDialog();
                         }
                         else if(menuItem.getItemId() == R.id.popup_export_details){
                             showToast("Export Details");
@@ -245,7 +249,8 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         return super.onOptionsItemSelected(item);
     }
 
-    private void setRecyclerView(Dialog dialog, RecyclerView dialogRecyclelrView, RecyclerView.Adapter dialogAdapter,
+    //Dialog For New Experiment
+    private void setNewExperimentRecyclerView(Dialog dialog, RecyclerView dialogRecyclelrView, RecyclerView.Adapter dialogAdapter,
                                  ArrayList<String> columnNames, RelativeLayout dialogLayout){
         dialogAdapter = new NewColumnAdapter(columnNames, dialog.getContext(), dialogLayout, tableRecyclerView);
         dialogRecyclelrView.setAdapter(dialogAdapter);
@@ -281,7 +286,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         LinearLayoutManager dialogLayoutManager = new LinearLayoutManager(dialog.getContext());
         dialogRecylerView.setLayoutManager(dialogLayoutManager);
         final RecyclerView.Adapter detailsAdapter = null;
-        setRecyclerView(dialog, dialogRecylerView, detailsAdapter, columnNames, dialogLayout);
+        setNewExperimentRecyclerView(dialog, dialogRecylerView, detailsAdapter, columnNames, dialogLayout);
 
 
         //Button Listener here.
@@ -290,7 +295,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
             public void onClick(View view) {
                 if(columnName.getText().toString().trim().length()>0){
                     columnNames.add(columnName.getText().toString());
-                    setRecyclerView(dialog, dialogRecylerView, detailsAdapter, columnNames, dialogLayout);
+                    setNewExperimentRecyclerView(dialog, dialogRecylerView, detailsAdapter, columnNames, dialogLayout);
                     dialogRecylerView.scrollToPosition(columnNames.size()-1);
                     columnName.setText("");
                 }
@@ -324,6 +329,85 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         createNewExperiment.setOnClickListener(createNewExperimentListener);
         back.setOnClickListener(backListener);
         dialog.show();
+    }
+
+    //Dialog For Plot Graph
+    private void setPlotGraphRecyclerView(RecyclerView dialogRecyclelrView, RecyclerView.Adapter dialogAdapter,
+                                 ArrayList<Pair<String, String>> graphList, RecyclerView.Adapter graphAdapter,
+                                 ArrayList<DataSelectColumn> columnNames, LinearLayout graphRecyclerViewLayout,
+                                 TextView emptyLayout){
+        dialogAdapter = new GraphSelectAdapter(columnNames, graphList, graphAdapter, graphRecyclerViewLayout, emptyLayout, this);
+        dialogRecyclelrView.setAdapter(dialogAdapter);
+    }
+
+    private void launchPlotGraohDialog(){
+        final Dialog dialog= new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_graph_column);
+
+        WindowManager.LayoutParams lp= new WindowManager.LayoutParams();
+        Window window= dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+        lp.width= WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height= WindowManager.LayoutParams.MATCH_PARENT;
+        window.setAttributes(lp);
+
+        //Add Array for Horizontal ReyclerView.
+        final ArrayList<DataSelectColumn> columnName = new ArrayList<>();
+        for(int i=0; i<columnList.size(); i++){
+            columnName.add(new DataSelectColumn(columnList.get(i)));
+        }
+        final ArrayList<Pair<String,String>> graphList = new ArrayList<>();
+
+        Button done = (Button) dialog.findViewById(R.id.bDone);
+        ImageView back = (ImageView) dialog.findViewById(R.id.ivBack);
+        TextView emptyLayout = (TextView) dialog.findViewById(R.id.tvEmptyLayout);
+        LinearLayout graphRecyclerViewLayout= (LinearLayout) dialog.findViewById(R.id.llGraphRecyclerView);
+        graphRecyclerViewLayout.setVisibility(View.GONE);
+
+        //For displaying list of Graphs that'll be plotted.
+        final RecyclerView graphRecyclerView= (RecyclerView) dialog.findViewById(R.id.rvGraphList);
+        LinearLayoutManager graphLayoutManager = new LinearLayoutManager(dialog.getContext());
+        graphRecyclerView.setLayoutManager(graphLayoutManager);
+        final RecyclerView.Adapter graphAdapter = new GraphListAdapter(graphList, graphRecyclerViewLayout, emptyLayout, this);
+        graphRecyclerView.setAdapter(graphAdapter);
+
+        //For adding columnList to GraphList.
+        final RecyclerView columnRecyclerView= (RecyclerView) dialog.findViewById(R.id.rvGraphColumn);
+        LinearLayoutManager columnLayoutManager = new LinearLayoutManager(dialog.getContext());
+        columnLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        columnRecyclerView.setLayoutManager(columnLayoutManager);
+        final RecyclerView.Adapter columnAdapter = null;
+        setPlotGraphRecyclerView(columnRecyclerView, columnAdapter, graphList, graphAdapter, columnName,
+                graphRecyclerViewLayout, emptyLayout);
+
+        //Button Listener here.
+        View.OnClickListener doneListener= new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(graphList.size() > 0){
+                    Intent iPlotGraph = new Intent(view.getContext(), PlotGraph.class);
+                    startActivity(iPlotGraph);
+                    dialog.dismiss();
+                }
+                else{
+                    showToast("No Graphs to  be Plotted.");
+                }
+            }
+        };
+
+        View.OnClickListener backListener= new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        };
+
+        //Add listeners here..
+        done.setOnClickListener(doneListener);
+        back.setOnClickListener(backListener);
+        dialog.show();
+        hideKeyboard();
     }
 
     private void showToast(String message){

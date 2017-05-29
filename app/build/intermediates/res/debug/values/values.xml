@@ -396,7 +396,9 @@
     <string name="decline">Decline</string>
     <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/values/strings.xml -->
     <eat-comment/>
-    <string name="plot_graph_help">Please select two columns form below to plot graph. \n First column selected will be X-axis by default.</string>
+    <string name="plot_graph_empty">No Graphs for Plotting. \n Please select two columns from  above list to plot a Graph.</string>
+    <string name="plot_graph_help">Please select two columns form below to plot graph. First column selected will be X-axis by default. You may plot multiple graphs in one go.</string>
+    <string name="plot_graph_main_content">Graphs to be Plotted : </string>
     <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.1/res/values/values.xml -->
     <eat-comment/>
     <string name="status_bar_notification_info_overflow">999+</string>

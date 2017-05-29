@@ -23,7 +23,7 @@
                     android:backgroundTint="#dddddd" android:layout_alignParentRight="true"
                     android:id="@+id/ivOverflowMenu" android:layout_centerVertical="true"/>
 
-                <TextView
+                <Assets.TextViewGrandHotel
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:id="@+id/tvToolbarTitle" android:textColor="#dddddd"
                     android:textSize="32sp" android:layout_centerVertical="true"

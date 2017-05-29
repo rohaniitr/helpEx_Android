@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="@dimen/custom_table_cell_width" android:layout_height="68sp">
 
-    <Assets.TextViewPacifico
-        android:layout_width="match_parent" android:layout_height="310sp"
+    <Assets.TextViewGrandHotel
+        android:layout_width="match_parent" android:layout_height="50sp"
         android:id="@+id/tvColumnName" android:layout_alignParentBottom="true"
         android:textSize="28sp" android:textColor="#eeeeee"
-        android:background="@color/custom_table_header_background" android:gravity="center"/>
+        android:background="#20c659" android:gravity="center"/>
 
     <ImageView
-        android:layout_width="20sp" android:layout_height="20sp"
+        android:layout_width="30sp" android:layout_height="30sp"
         android:layout_alignParentRight="true" android:layout_marginRight="16sp"
         android:background="@drawable/opaque_circle" android:src="@drawable/icon_tick_white"
-        android:tint="@color/custom_dialog_button_background" android:elevation="10sp"
+        android:tint="#9bce21" android:backgroundTint="#ffffff"
+        android:elevation="10sp" android:layout_marginTop="3sp"
         android:id="@+id/ivTick" android:scaleType="fitXY"/>
-
-    <ImageView
-        android:layout_width="1sp" android:layout_height="match_parent"
-        android:background="@android:color/white"/>
 
     <ImageView
         android:layout_width="1sp" android:layout_height="match_parent"

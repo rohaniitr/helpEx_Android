@@ -1,29 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="@dimen/custom_table_cell_width" android:layout_height="68sp">
 
-    <RelativeLayout
-        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-        android:paddingLeft="16sp" android:paddingRight="16sp"
-        android:background="@color/custom_dialog_button_background" android:id="@id/rlToolbar">
+    <Assets.TextViewGrandHotel
+        android:layout_width="match_parent" android:layout_height="50sp"
+        android:id="@+id/tvColumnName" android:layout_alignParentBottom="true"
+        android:textSize="28sp" android:textColor="#eeeeee"
+        android:background="#20c659" android:gravity="center"/>
 
-        <ImageView
-            android:layout_width="32sp" android:layout_height="32sp"
-            android:id="@+id/ivBack" android:layout_centerVertical="true"
-            android:background="@drawable/abc_ic_ab_back_mtrl_am_alpha" android:tint="#eeeeee"/>
+    <ImageView
+        android:layout_width="30sp" android:layout_height="30sp"
+        android:layout_alignParentRight="true" android:layout_marginRight="16sp"
+        android:background="@drawable/opaque_circle" android:src="@drawable/icon_tick_white"
+        android:tint="#9bce21" android:backgroundTint="#ffffff"
+        android:elevation="10sp" android:layout_marginTop="3sp"
+        android:id="@+id/ivTick" android:scaleType="fitXY"/>
 
-        <Assets.EditTextGrandHotel
-            android:layout_width="match_parent" android:layout_height="match_parent"
-            android:text="Plot Graphs. . ." android:textColor="#eeeeee"/>
-
-    </RelativeLayout>
-
-    <Assets.TextViewCaviarDreams
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:id="@+id/tvHint" android:text="@string/plot_graph_help"
-        android:textSize="12sp" android:textColor="@color/custom_dialog_hint"
-        android:layout_below="@+id/rlToolbar"/>
-
-    
+    <ImageView
+        android:layout_width="1sp" android:layout_height="match_parent"
+        android:background="@android:color/white" android:layout_alignParentRight="true"/>
 
 </RelativeLayout><!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/layout/element_plot_graph_column.xml -->
