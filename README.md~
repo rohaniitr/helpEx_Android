@@ -18,7 +18,7 @@ The functionalities in the app are:
 <p align="center">
   <img src="Extras/Screenshots/splash_screen.jpg" height="480" width="280"/> 
   <img src="Extras/Screenshots/home.jpg" height="480" width="280"/> 
-  <img src="Extras/Screenshots/new_experiment Dialog.jpg" height="480" width="280"/> 
+  <img src="Extras/Screenshots/new_experiment_dialog.jpg" height="480" width="280"/> 
 </p>
 <p align="center">
   <img src="Extras/Screenshots/table_horizontal_scrolling.jpg" height="480" width="280"/> 

@@ -22,6 +22,6 @@ The functionalities in the app are:
 </p>
 <p align="center">
   <img src="Extras/Screenshots/table_horizontal_scrolling.jpg" height="480" width="280"/> 
-  <img src="Extras/Screenshots/table_vertical_scrolling.jpg" height="480" width="280"/> 
+  <img src="Extras/Screenshots/plot_graph_selection.jpg" height="480" width="280"/> 
   <img src="Extras/Screenshots/plot_graph.jpg" height="480" width="280"/> 
 </p>
