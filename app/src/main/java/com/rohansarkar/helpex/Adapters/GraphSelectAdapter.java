@@ -83,7 +83,7 @@ public class GraphSelectAdapter extends RecyclerView.Adapter<GraphSelectAdapter.
                     //First element added. (X-axis)
                     xPos = position;
                 }
-                else if(xPos != yPos){
+                else if(xPos != position){
                     //Second element added. (Y-axis)
                     //Add Graph detail to graphList & Update UI.
                     graphList.add(new Pair<String, String>(columnNames.get(xPos).columnName, columnNames.get(position).columnName));
