@@ -22,7 +22,7 @@
 
     <Assets.TextViewCaviarDreams
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:id="@+id/tvHint" android:text="@string/plot_graph_help"
+        android:id="@+id/tvHint" android:text="@string/plot_graph_hint_1"
         android:textSize="13sp" android:textColor="@color/custom_dialog_hint"
         android:layout_below="@+id/rlToolbar" android:layout_margin="12sp"
         android:gravity="center_horizontal" />

@@ -2,6 +2,7 @@ package com.rohansarkar.helpex.Adapters;
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,8 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.rohansarkar.helpex.R;
 
 import java.util.ArrayList;
@@ -20,6 +24,7 @@ import java.util.ArrayList;
  */
 public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder>{
     private Context context;
+    private FloatingActionButton addRow;
     private CoordinatorLayout layout;
 
     private ArrayList<ArrayList<String>> tableData;
@@ -38,10 +43,11 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder>{
         }
     }
 
-    public TableAdapter(ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList, Context context,
-                        CoordinatorLayout layout){
+    public TableAdapter(ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList, FloatingActionButton addRow,
+                        Context context, CoordinatorLayout layout){
         this.tableData = tableData;
         this.columnList = columnList;
+        this.addRow = addRow;
         this.layout= layout;
         this.context= context;
     }
@@ -62,6 +68,19 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder>{
 
         TableRowAdapter rowAdapter = new TableRowAdapter(tableData.get(position), context);
         holder.rowRecyclerView.setAdapter(rowAdapter);
+
+        if(position+1 == tableData.size()){
+            addRow.setVisibility(View.VISIBLE);
+            YoYo.with(Techniques.FlipInY).duration(600).playOn(addRow);
+        }
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        if(holder.getAdapterPosition()+1 == tableData.size()) {
+            YoYo.with(Techniques.FlipOutY).duration(600).playOn(addRow);
+        }
     }
 
     @Override

@@ -8,7 +8,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.rohansarkar.helpex.R;
+
+import java.util.Random;
 
 public class WelcomeScreen extends Activity {
 
@@ -20,7 +24,7 @@ public class WelcomeScreen extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome_screen);
 
-//        startAnimation();
+        startAnimation();
         startTimer();
     }
 
@@ -40,9 +44,38 @@ public class WelcomeScreen extends Activity {
     }
 
     private void startAnimation(){
-        welcomeMessage = (TextView) findViewById(R.id.tvWelcomeMessage);
-
-        Animation zoomIn = AnimationUtils.loadAnimation(this, R.anim.zoom_in);
-        welcomeMessage.setAnimation(zoomIn);
+        Random r = new Random();
+        switch (r.nextInt(9)){
+            case 0:
+                YoYo.with(Techniques.Pulse).duration(1000).playOn(findViewById(R.id.tvWelcomeMessage));
+                break;
+            case 1:
+                YoYo.with(Techniques.RubberBand).duration(1000).playOn(findViewById(R.id.tvWelcomeMessage));
+                break;
+            case 2:
+                YoYo.with(Techniques.Shake).duration(1000).playOn(findViewById(R.id.tvWelcomeMessage));
+                break;
+            case 3:
+                YoYo.with(Techniques.Swing).duration(1000).playOn(findViewById(R.id.tvWelcomeMessage));
+                break;
+            case 4:
+                YoYo.with(Techniques.Wobble).duration(1000).playOn(findViewById(R.id.tvWelcomeMessage));
+                break;
+            case 5:
+                YoYo.with(Techniques.Bounce).duration(1000).playOn(findViewById(R.id.tvWelcomeMessage));
+                break;
+            case 6:
+                YoYo.with(Techniques.Tada).duration(1000).playOn(findViewById(R.id.tvWelcomeMessage));
+                break;
+            case 7:
+                YoYo.with(Techniques.StandUp).duration(1000).playOn(findViewById(R.id.tvWelcomeMessage));
+                break;
+            case 8:
+                YoYo.with(Techniques.Wave).duration(1000).playOn(findViewById(R.id.tvWelcomeMessage));
+                break;
+            case 9:
+                YoYo.with(Techniques.Hinge).duration(1000).playOn(findViewById(R.id.tvWelcomeMessage));
+                break;
+        }
     }
 }

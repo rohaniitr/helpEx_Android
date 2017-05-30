@@ -138,7 +138,6 @@
     <declare-styleable name="CoordinatorLayout_LayoutParams"><attr name="android:layout_gravity"/><attr format="string" name="layout_behavior"/><attr format="reference" name="layout_anchor"/><attr format="integer" name="layout_keyline"/><attr name="layout_anchorGravity"><flag name="top" value="0x30"/><flag name="bottom" value="0x50"/><flag name="left" value="0x03"/><flag name="right" value="0x05"/><flag name="center_vertical" value="0x10"/><flag name="fill_vertical" value="0x70"/><flag name="center_horizontal" value="0x01"/><flag name="fill_horizontal" value="0x07"/><flag name="center" value="0x11"/><flag name="fill" value="0x77"/><flag name="clip_vertical" value="0x80"/><flag name="clip_horizontal" value="0x08"/><flag name="start" value="0x00800003"/><flag name="end" value="0x00800005"/></attr></declare-styleable>
     <declare-styleable name="DrawerArrowToggle"><attr format="color" name="color"/><attr format="boolean" name="spinBars"/><attr format="dimension" name="drawableSize"/><attr format="dimension" name="gapBetweenBars"/><attr format="dimension" name="topBottomBarArrowSize"/><attr format="dimension" name="middleBarArrowSize"/><attr format="dimension" name="barSize"/><attr format="dimension" name="thickness"/></declare-styleable>
     <declare-styleable name="FloatingActionButton"><attr name="android:background"/><attr name="backgroundTint"/><attr name="backgroundTintMode"/><attr format="color" name="rippleColor"/><attr name="fabSize"><enum name="normal" value="0"/><enum name="mini" value="1"/></attr><attr name="elevation"/><attr format="dimension" name="pressedTranslationZ"/><attr format="dimension" name="borderWidth"/></declare-styleable>
-    <declare-styleable name="GraphViewXML"><attr format="string" name="seriesData"/><attr format="string" name="seriesType"/><attr format="string" name="seriesTitle"/><attr name="android:title"/><attr format="color" name="seriesColor"/></declare-styleable>
     <declare-styleable name="LinearLayoutCompat"><attr name="android:orientation"/><attr name="android:gravity"/><attr name="android:baselineAligned"/><attr name="android:baselineAlignedChildIndex"/><attr name="android:weightSum"/><attr format="boolean" name="measureWithLargestChild"/><attr name="divider"/><attr name="showDividers"><flag name="none" value="0"/><flag name="beginning" value="1"/><flag name="middle" value="2"/><flag name="end" value="4"/></attr><attr format="dimension" name="dividerPadding"/></declare-styleable>
     <declare-styleable name="LinearLayoutCompat_Layout"><attr name="android:layout_width"/><attr name="android:layout_height"/><attr name="android:layout_weight"/><attr name="android:layout_gravity"/></declare-styleable>
     <declare-styleable name="ListPopupWindow"><attr name="android:dropDownVerticalOffset"/><attr name="android:dropDownHorizontalOffset"/></declare-styleable>
@@ -345,6 +344,9 @@
     <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-ads/7.8.0/res/values/admob_strings.xml -->
     <eat-comment/>
     <string name="accept">Accept</string>
+    <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/build/intermediates/exploded-aar/com.daimajia.androidanimations/library/2.2/res/values/values.xml -->
+    <eat-comment/>
+    <string name="android_animations_lib_name">AndroidAnimations</string>
     <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="app_name">helpEx</string>
@@ -397,8 +399,9 @@
     <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="plot_graph_empty">No Graphs for Plotting. \n Please select two columns from  above list to plot a Graph.</string>
-    <string name="plot_graph_help">Please select two columns form below to plot graph. First column selected will be X-axis by default. You may plot multiple graphs in one go.</string>
-    <string name="plot_graph_main_content">Graphs to be Plotted : </string>
+    <string name="plot_graph_hint_1">Please select two columns form below to plot graph. First column selected will be X-axis by default. You may plot multiple graphs in one go.</string>
+    <string name="plot_graph_hint_2">\n Please select columns for Y-axis.</string>
+    <string name="plot_graph_main_content">List of Graphs to be Plotted : </string>
     <!-- From: file:/home/rohan/AndroidStudioProjects/helpEx/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.1/res/values/values.xml -->
     <eat-comment/>
     <string name="status_bar_notification_info_overflow">999+</string>

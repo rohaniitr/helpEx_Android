@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,16 +19,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.data.Entry;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 import com.rohansarkar.helpex.Adapters.PlotGraphAdapter;
-import com.rohansarkar.helpex.Adapters.TableAdapter;
+import com.rohansarkar.helpex.CustomData.DataExperiment;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
 import com.rohansarkar.helpex.R;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 import Assets.SmartRecyclerView;
+import Assets.Util;
 
 /**
  * Created by rohan on 25/5/17.
@@ -41,10 +42,13 @@ public class PlotGraph extends AppCompatActivity{
     CoordinatorLayout layout;
     Toolbar toolbar;
     TextView toolbarTitle;
+    private DatabaseManager detailsManager;
 
-    private ArrayList<String> titles;
+    private ArrayList<Pair<String,String>> graphList;
     private ArrayList<ArrayList<String>> xValues;
     private ArrayList<ArrayList<Entry>> yValues;
+    DataExperiment experimentData;
+    ArrayList<String> columnList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,10 +58,27 @@ public class PlotGraph extends AppCompatActivity{
         init();
         getData();
         setToolbar();
-        setRecyclerView(yValues, xValues, titles);
+        setRecyclerView(yValues, xValues, graphList);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        detailsManager.close();
     }
 
     private void getData(){
+        int size = getIntent().getIntExtra(Util.GRAPH_LIST_SIZE, -1);
+
+        for(int i=0; i<size; i++){
+            ArrayList<String> temp = Util.splitString(getIntent().getStringExtra(Util.GRAPH_LIST + i), "~");
+            graphList.add(new Pair<String, String>(temp.get(0), temp.get(1)));
+        }
+
+        long rowId = getIntent().getLongExtra(Util.EXPERIMENT_ID, -1);
+        experimentData = detailsManager.getExperimentDetails(rowId);
+        columnList = Util.splitString(experimentData.columnNames, "~");
+
         Random r = new Random();
 
         ArrayList<String> xData = new ArrayList<>();
@@ -84,13 +105,6 @@ public class PlotGraph extends AppCompatActivity{
             xValues.add(x);
             val = val*10;
         }
-
-        titles.add("X vs Theta");
-        titles.add("Alpha vs Gamma");
-        titles.add("Beta vs Y");
-        titles.add("Y vs Alpha");
-        titles.add("sin(Theta) vs Gamma");
-        titles.add("Woff vs Meow");
     }
 
     private void init(){
@@ -103,12 +117,16 @@ public class PlotGraph extends AppCompatActivity{
 
         yValues = new ArrayList<>();
         xValues = new ArrayList<>();
-        titles = new ArrayList<>();
+        graphList = new ArrayList<>();
+        columnList = new ArrayList<>();
+
+        detailsManager = new DatabaseManager(this);
+        detailsManager.open();
     }
 
     private void setRecyclerView(ArrayList<ArrayList<Entry>> yValues, ArrayList<ArrayList<String>> xValues,
-                                 ArrayList<String> titles){
-        adapter = new PlotGraphAdapter(yValues, xValues, titles, this);
+                                 ArrayList<Pair<String,String>> graphList){
+        adapter = new PlotGraphAdapter(yValues, xValues, graphList, this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -123,7 +141,7 @@ public class PlotGraph extends AppCompatActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         toolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
-        toolbarTitle.setText("Malus Law");
+        toolbarTitle.setText(experimentData.title);
     }
 
     @Override

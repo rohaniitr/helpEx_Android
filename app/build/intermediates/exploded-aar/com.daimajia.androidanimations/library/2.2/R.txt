@@ -1,0 +1,1 @@
+int string android_animations_lib_name 0x7f020000

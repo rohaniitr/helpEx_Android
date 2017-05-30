@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.media.TimedText;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -45,6 +47,7 @@ import com.rohansarkar.helpex.R;
 import java.util.ArrayList;
 
 import Assets.SmartRecyclerView;
+import Assets.Util;
 
 /**
  * Created by rohan on 11/5/17.
@@ -57,6 +60,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     RecyclerView.Adapter tableAdapter, headerAdapter, rowAdapter;
     LinearLayoutManager tableLayoutManager, headerLayoutManager, rowLayoutManager;
     RecyclerView.OnScrollListener rvScrollListener;
+    FloatingActionButton addRow;
     CoordinatorLayout layout;
     Toolbar toolbar;
     ImageView overflowMenu;
@@ -113,7 +117,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     }
 
     private void setRecyclerView(ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList){
-        tableAdapter = new TableAdapter(tableData, columnList, this, layout);
+        tableAdapter = new TableAdapter(tableData, columnList, addRow, this, layout);
         tableRecyclerView.computedWidth = getRecyclerWidth();
         tableRecyclerView.setAdapter(tableAdapter);
 
@@ -138,6 +142,8 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         emptyLayout = (RelativeLayout) findViewById(R.id.rlEmptyLayout);
         tableLayout = (RelativeLayout) findViewById(R.id.rlTableLayout);
         headerPadding = (ImageView) findViewById(R.id.ivHeaderPadding);
+        addRow = (FloatingActionButton) findViewById(R.id.fabAddRow);
+        addRow.setVisibility(View.GONE);
 
         tableLayoutManager = new LinearLayoutManager(this);
         tableLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -224,7 +230,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                             launchNewColumnDialog();
                         }
                         else if(menuItem.getItemId() == R.id.popup_plot_graph){
-                            launchPlotGraohDialog();
+                            launchPlotGraphDialog();
                         }
                         else if(menuItem.getItemId() == R.id.popup_export_details){
                             showToast("Export Details");
@@ -335,12 +341,12 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     private void setPlotGraphRecyclerView(RecyclerView dialogRecyclelrView, RecyclerView.Adapter dialogAdapter,
                                  ArrayList<Pair<String, String>> graphList, RecyclerView.Adapter graphAdapter,
                                  ArrayList<DataSelectColumn> columnNames, LinearLayout graphRecyclerViewLayout,
-                                 TextView emptyLayout){
-        dialogAdapter = new GraphSelectAdapter(columnNames, graphList, graphAdapter, graphRecyclerViewLayout, emptyLayout, this);
+                                 TextView emptyLayout, TextView hint){
+        dialogAdapter = new GraphSelectAdapter(columnNames, graphList, graphAdapter, graphRecyclerViewLayout, emptyLayout, hint, this);
         dialogRecyclelrView.setAdapter(dialogAdapter);
     }
 
-    private void launchPlotGraohDialog(){
+    private void launchPlotGraphDialog(){
         final Dialog dialog= new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_graph_column);
@@ -363,6 +369,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         ImageView back = (ImageView) dialog.findViewById(R.id.ivBack);
         TextView emptyLayout = (TextView) dialog.findViewById(R.id.tvEmptyLayout);
         LinearLayout graphRecyclerViewLayout= (LinearLayout) dialog.findViewById(R.id.llGraphRecyclerView);
+        TextView hint = (TextView) dialog.findViewById(R.id.tvHint);
         graphRecyclerViewLayout.setVisibility(View.GONE);
 
         //For displaying list of Graphs that'll be plotted.
@@ -379,7 +386,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         columnRecyclerView.setLayoutManager(columnLayoutManager);
         final RecyclerView.Adapter columnAdapter = null;
         setPlotGraphRecyclerView(columnRecyclerView, columnAdapter, graphList, graphAdapter, columnName,
-                graphRecyclerViewLayout, emptyLayout);
+                graphRecyclerViewLayout, emptyLayout, hint);
 
         //Button Listener here.
         View.OnClickListener doneListener= new View.OnClickListener() {
@@ -387,6 +394,14 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
             public void onClick(View view) {
                 if(graphList.size() > 0){
                     Intent iPlotGraph = new Intent(view.getContext(), PlotGraph.class);
+
+                    //Attach Selected Graph Data.
+                    iPlotGraph.putExtra(Util.EXPERIMENT_ID, rowId);
+                    iPlotGraph.putExtra(Util.GRAPH_LIST_SIZE, graphList.size());
+                    for(int i=0; i<graphList.size(); i++){
+                        iPlotGraph.putExtra(Util.GRAPH_LIST + i, graphList.get(i).first + "~" + graphList.get(i).second);
+                    }
+
                     startActivity(iPlotGraph);
                     dialog.dismiss();
                 }
