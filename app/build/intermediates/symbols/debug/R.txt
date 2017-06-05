@@ -393,7 +393,7 @@ int color switch_thumb_material_dark 0x7f0b0064
 int color switch_thumb_material_light 0x7f0b0065
 int color switch_thumb_normal_material_dark 0x7f0b0055
 int color switch_thumb_normal_material_light 0x7f0b0056
-int color welcome_background 0x7f0b0057
+int color welcome_background_dim 0x7f0b0057
 int color welcome_text 0x7f0b0058
 int dimen abc_action_bar_content_inset_material 0x7f07000c
 int dimen abc_action_bar_default_height_material 0x7f070001
@@ -591,11 +591,12 @@ int drawable ic_launcher 0x7f020057
 int drawable icon_add_white 0x7f020058
 int drawable icon_more_vert 0x7f020059
 int drawable icon_tick_white 0x7f02005a
-int drawable notification_template_icon_bg 0x7f02005f
+int drawable notification_template_icon_bg 0x7f020060
 int drawable opaque_circle 0x7f02005b
 int drawable snackbar_background 0x7f02005c
-int drawable star_hollow 0x7f02005d
-int drawable star_solid 0x7f02005e
+int drawable splash_screen 0x7f02005d
+int drawable star_hollow 0x7f02005e
+int drawable star_solid 0x7f02005f
 int id action0 0x7f0c00a9
 int id action_bar 0x7f0c005a
 int id action_bar_activity_content 0x7f0c0000

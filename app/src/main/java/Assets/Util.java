@@ -1,6 +1,9 @@
 package Assets;
 
 import android.content.Context;
+import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import java.util.ArrayList;
 
@@ -9,10 +12,7 @@ import java.util.ArrayList;
  */
 public class Util {
 
-    public enum DatabaseType{
-        EXPERIMENT_DETAILS,
-        EXPERIMENT_RECORDS
-    }
+    private static String LOG_TAG = "Util";
 
     public static enum StarType{
         STARRED(0),
@@ -38,12 +38,39 @@ public class Util {
         if(content== null || !content.contains(separator))
             return contentList;
 
-        String[] contentArray= content.split(separator);
+        String[] contentArray= content.split(separator, -1);
 
         for(int i=0; i<contentArray.length; i++){
             contentList.add(contentArray[i]);
         }
         return contentList;
+    }
+
+    public static String getString(ArrayList<String> contentList, String symbol){
+        String s = "";
+        for(int i=0; i<contentList.size(); i++)
+            s+= contentList.get(i) + " ";
+        Log.d(LOG_TAG, "Content Size : " + contentList.size() + " - " + s);
+
+        if (contentList.size()<=0)
+            return s;
+
+        s = contentList.get(0);
+        for (int i=0; i<contentList.size(); i++)
+            s += symbol + contentList.get(i);
+
+        Log.d(LOG_TAG, "s : " + s);
+        return s;
+    }
+
+    //APIs for Soft Keyboard.
+    private void showKeyboard(Context context){
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+    }
+    private void hideKeyboard(Context context, View view){
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     public static String GRAPH_LIST_SIZE = "graphListSize";

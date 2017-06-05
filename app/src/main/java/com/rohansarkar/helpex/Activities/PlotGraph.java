@@ -12,22 +12,17 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.data.Entry;
 import com.rohansarkar.helpex.Adapters.PlotGraphAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
-import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseEperimentManager;
 import com.rohansarkar.helpex.R;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import Assets.SmartRecyclerView;
 import Assets.Util;
 
 /**
@@ -42,7 +37,7 @@ public class PlotGraph extends AppCompatActivity{
     CoordinatorLayout layout;
     Toolbar toolbar;
     TextView toolbarTitle;
-    private DatabaseManager detailsManager;
+    private DatabaseEperimentManager detailsManager;
 
     private ArrayList<Pair<String,String>> graphList;
     private ArrayList<ArrayList<String>> xValues;
@@ -120,7 +115,7 @@ public class PlotGraph extends AppCompatActivity{
         graphList = new ArrayList<>();
         columnList = new ArrayList<>();
 
-        detailsManager = new DatabaseManager(this);
+        detailsManager = new DatabaseEperimentManager(this);
         detailsManager.open();
     }
 

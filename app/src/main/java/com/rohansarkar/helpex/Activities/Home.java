@@ -27,7 +27,7 @@ import android.widget.Toast;
 import com.rohansarkar.helpex.Adapters.HomeAdapter;
 import com.rohansarkar.helpex.Adapters.NewColumnAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
-import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseEperimentManager;
 import com.rohansarkar.helpex.R;
 
 import java.text.DateFormat;
@@ -50,7 +50,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
 
     ArrayList<DataExperiment> experiments;
     ArrayList<DataExperiment> favouriteExperiments;
-    DatabaseManager detailsManager;
+    DatabaseEperimentManager detailsManager;
     boolean isFavourite;
 
     @Override
@@ -94,7 +94,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
 
         experiments= new ArrayList<>();
         favouriteExperiments = new ArrayList<>();
-        detailsManager = new DatabaseManager(this);
+        detailsManager = new DatabaseEperimentManager(this);
         isFavourite = false;
     }
 

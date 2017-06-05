@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--<color name="welcome_background">#aaaaaa</color>-->
-    <color name="welcome_background">#2478be</color>
+    <color name="welcome_background_dim">#88000000</color>
     <color name="welcome_text">#eeeeee</color>
 
     <color name="custom_primary_color">#eeeeee</color>

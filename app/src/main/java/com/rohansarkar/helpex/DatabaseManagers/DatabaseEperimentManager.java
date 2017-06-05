@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.rohansarkar.helpex.CustomData.DataExperiment;
-import com.rohansarkar.helpex.CustomData.DataRecord;
 
 import java.util.ArrayList;
 
@@ -18,7 +17,7 @@ import Assets.Util;
 /**
  * Created by rohan on 16/3/17.
  */
-public class DatabaseManager {
+public class DatabaseEperimentManager {
 
     String LOG_TAG= "DatabaseManager Logs";
     public static final String KEY_EXPERIMENT_ID = "experiment_id";
@@ -29,7 +28,7 @@ public class DatabaseManager {
     public static final String KEY_TIME = "time";
     public static final String KEY_STAR_TYPE = "star_type";
 
-    private static final String DATABASE_NAME = "helpEx";
+    private static final String DATABASE_NAME = "helpEx_experiment";
     private static final String TABLE_EXPERIMENT_DETAILS = "ExperimentDetails";
     private static final int DATABASE_VERSION = 1;
 
@@ -38,8 +37,6 @@ public class DatabaseManager {
     private SQLiteDatabase ourDatabase, ourDbRecords;
 
     private static class DbHelper extends SQLiteOpenHelper {
-
-        private Util.DatabaseType databaseType;
 
         public DbHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -65,10 +62,10 @@ public class DatabaseManager {
         }
     }
 
-    public DatabaseManager(Context c){
+    public DatabaseEperimentManager(Context c){
         ourContext = c;
     }
-    public DatabaseManager open() throws SQLException {
+    public DatabaseEperimentManager open() throws SQLException {
 
         ourHelper = new DbHelper(ourContext);
         ourDatabase = ourHelper.getWritableDatabase();

@@ -2,6 +2,9 @@ package com.rohansarkar.helpex.Adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +19,9 @@ import java.util.ArrayList;
 /**
  * Created by rohan on 23/5/17.
  */
-public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.ViewHolder>{
-    private ArrayList<String> cellValues;
+public class TableCellAdapter extends RecyclerView.Adapter<TableCellAdapter.ViewHolder>{
+    private ArrayList<String> columnList;
+    private ArrayList<ArrayList<String>> tableData;
     private Context context;
 
     String LOG_TAG= this.getClass().getSimpleName();
@@ -33,13 +37,14 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.ViewHo
         }
     }
 
-    public TableRowAdapter(ArrayList<String> cellValues, Context context){
-        this.cellValues = cellValues;
+    public TableCellAdapter(ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList, Context context){
+        this.tableData = tableData;
+        this.columnList = columnList;
         this.context= context;
     }
 
     @Override
-    public TableRowAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TableCellAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.element_table_cell, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
@@ -47,12 +52,27 @@ public class TableRowAdapter extends RecyclerView.Adapter<TableRowAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        holder.cell.setText(cellValues.get(position));
+        holder.cell.setText(tableData.get(position/columnList.size()).get(position%columnList.size()));
+
+        //To save data to tableView dynamically.
+        holder.cell.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+                tableData.get(position/columnList.size()).set(position%columnList.size(), charSequence.toString());
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return cellValues.size();
+        return (tableData.size()*columnList.size());
     }
 
     /*

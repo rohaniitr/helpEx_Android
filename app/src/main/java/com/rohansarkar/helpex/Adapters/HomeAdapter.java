@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 import com.rohansarkar.helpex.Activities.ExperimentTable;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
-import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseEperimentManager;
 import com.rohansarkar.helpex.R;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder>{
     private Context context;
     private CoordinatorLayout layout;
     private RecyclerView recyclerView;
-    private DatabaseManager detailsManager;
+    private DatabaseEperimentManager detailsManager;
 
     private ArrayList<DataExperiment> experiments;
     private boolean isFavourite;
@@ -63,7 +63,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder>{
     }
 
     public HomeAdapter(ArrayList<DataExperiment> experiments, Context context, CoordinatorLayout layout,RecyclerView recyclerView,
-                       DatabaseManager detailsManager, boolean isFavourite){
+                       DatabaseEperimentManager detailsManager, boolean isFavourite){
         this.experiments= experiments;
         this.layout= layout;
         this.context= context;

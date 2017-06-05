@@ -2048,7 +2048,7 @@ containing a value of this type.
         public static final int switch_thumb_material_light=0x7f0b0065;
         public static final int switch_thumb_normal_material_dark=0x7f0b0055;
         public static final int switch_thumb_normal_material_light=0x7f0b0056;
-        public static final int welcome_background=0x7f0b0057;
+        public static final int welcome_background_dim=0x7f0b0057;
         public static final int welcome_text=0x7f0b0058;
     }
     public static final class dimen {
@@ -2250,11 +2250,12 @@ containing a value of this type.
         public static final int icon_add_white=0x7f020058;
         public static final int icon_more_vert=0x7f020059;
         public static final int icon_tick_white=0x7f02005a;
-        public static final int notification_template_icon_bg=0x7f02005f;
+        public static final int notification_template_icon_bg=0x7f020060;
         public static final int opaque_circle=0x7f02005b;
         public static final int snackbar_background=0x7f02005c;
-        public static final int star_hollow=0x7f02005d;
-        public static final int star_solid=0x7f02005e;
+        public static final int splash_screen=0x7f02005d;
+        public static final int star_hollow=0x7f02005e;
+        public static final int star_solid=0x7f02005f;
     }
     public static final class id {
         public static final int action0=0x7f0c00a9;

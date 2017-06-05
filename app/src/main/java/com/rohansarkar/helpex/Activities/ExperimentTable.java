@@ -7,11 +7,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.media.TimedText;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -36,12 +36,14 @@ import android.widget.Toast;
 import com.rohansarkar.helpex.Adapters.GraphListAdapter;
 import com.rohansarkar.helpex.Adapters.GraphSelectAdapter;
 import com.rohansarkar.helpex.Adapters.NewColumnAdapter;
-import com.rohansarkar.helpex.Adapters.TableAdapter;
+import com.rohansarkar.helpex.Adapters.TableCellAdapter;
 import com.rohansarkar.helpex.Adapters.TableHeaderAdapter;
 import com.rohansarkar.helpex.Adapters.TableRowNoAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
+import com.rohansarkar.helpex.CustomData.DataRecord;
 import com.rohansarkar.helpex.CustomData.DataSelectColumn;
-import com.rohansarkar.helpex.DatabaseManagers.DatabaseManager;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseEperimentManager;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseRecordsManager;
 import com.rohansarkar.helpex.R;
 
 import java.util.ArrayList;
@@ -70,11 +72,13 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     RelativeLayout tableLayout;   //If NumberOfColumns > 0
     ViewGroup headerViewGroup;
 
-    DatabaseManager detailsManager;
+    DatabaseEperimentManager detailsManager;
+    DatabaseRecordsManager recordsManager;
     DataExperiment experimentData;              //Data about Experiment selected.
     ArrayList<String> columnList;               //Contains Column List.
     ArrayList<String> prevColumnList;           //Contains Just Previous Column List. Required while shifting Columns.
     ArrayList<ArrayList<String>> tableData;     //Contains 2D Table Data.
+    ArrayList<DataRecord> experimentRecords;              //Gets Record from Database.
     long rowId;                                 //Row ID of the Selected Experiment.
 
     @Override
@@ -93,8 +97,39 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onDestroy() {
+        //Save data first. Then destroy instances.
+        saveData();
+
         super.onDestroy();
         detailsManager.close();
+        recordsManager.close();
+    }
+
+    public void saveData(){
+        if (tableData.size() >= experimentRecords.size()){
+            for (int i=0; i< experimentRecords.size(); i++){
+                experimentRecords.get(i).record = Util.getString(tableData.get(i), "~");
+                Log.d(LOG_TAG,  "Record[" + i + "] : " + experimentRecords.get(i).recordId);
+                recordsManager.updateRecord(experimentRecords.get(i));
+            }
+
+            for (int i = experimentRecords.size(); i<tableData.size(); i++){
+                DataRecord dataRecord = new DataRecord(experimentData.experimentID, Util.getString(tableData.get(i), "~"));
+                Log.d(LOG_TAG,  "Record[" + i + "] : " + dataRecord.recordId);
+                recordsManager.createRecord(dataRecord);
+            }
+        }
+        else {
+            for (int i=0; i< tableData.size(); i++){
+                experimentRecords.get(i).record = Util.getString(tableData.get(i), "~");
+                Log.d(LOG_TAG,  "Record[" + i + "] : " + experimentRecords.get(i).recordId);
+                recordsManager.updateRecord(experimentRecords.get(i));
+            }
+
+            for (int i = tableData.size(); i<tableData.size(); i++){;
+                recordsManager.deleteRecord(experimentRecords.get(i).recordId);
+            }
+        }
     }
 
     private void getData(){
@@ -105,19 +140,31 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         columnList = getColumnList(experimentData.columnNames);
         Log.d(LOG_TAG, "ColumnList Size : " + columnList.size());
 
-        //Get Table Data for  the Experiment.
-        for(int i=0; i<30; i++) {
-            ArrayList<String> rowData = new ArrayList<>();
-            for(int j=0; j<10; j++)
-                rowData.add(i + j + "");
-            tableData.add(rowData);
+        //Get experimentRecords of the experiment.
+        experimentRecords = recordsManager.getRecords((int)experimentData.experimentID);
+        tableData.clear();
+        for (int i=0; i< experimentRecords.size(); i++){
+            tableData.add(Util.splitString(experimentRecords.get(i).record, "~"));
         }
-//        experiments = detailsManager.getExperimentDetails();
-//        setRecyclerView(experiments);
+
+        //Dummy Variable at last.
+        ArrayList<String> data= new ArrayList<>();
+        for (int i=0; i<columnList.size(); i++)
+            data.add("");
+        tableData.add(data);
     }
 
     private void setRecyclerView(ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList){
-        tableAdapter = new TableAdapter(tableData, columnList, addRow, this, layout);
+        //Crash if Span == 0
+        if(columnList.size() <=0)
+            tableLayoutManager = new GridLayoutManager(this, -1);
+        else
+            tableLayoutManager = new GridLayoutManager(this, columnList.size());
+
+        tableRecyclerView.setLayoutManager(tableLayoutManager);
+        tableRecyclerView.setHasFixedSize(true);
+
+        tableAdapter = new TableCellAdapter(tableData,columnList, this);
         tableRecyclerView.computedWidth = getRecyclerWidth();
         tableRecyclerView.setAdapter(tableAdapter);
 
@@ -145,11 +192,6 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         addRow = (FloatingActionButton) findViewById(R.id.fabAddRow);
         addRow.setVisibility(View.GONE);
 
-        tableLayoutManager = new LinearLayoutManager(this);
-        tableLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        tableRecyclerView.setLayoutManager(tableLayoutManager);
-        tableRecyclerView.setHasFixedSize(true);
-
         rowLayoutManager = new LinearLayoutManager(this);
         rowLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rowRecyclerView.setLayoutManager(rowLayoutManager);
@@ -158,11 +200,15 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         columnList = new ArrayList<>();
         prevColumnList = new ArrayList<>();
         tableData = new ArrayList<>();
+        experimentRecords = new ArrayList<>();
 
         emptyLayout.setOnClickListener(this);
+        addRow.setOnClickListener(this);
 
-        detailsManager = new DatabaseManager(this);
+        detailsManager = new DatabaseEperimentManager(this);
         detailsManager.open();
+        recordsManager = new DatabaseRecordsManager(this);
+        recordsManager.open();
 
         //Table Header
         headerViewGroup = (ViewGroup) findViewById(R.id.vTableHeader);
@@ -243,6 +289,14 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
             case R.id.rlEmptyLayout:
                 launchNewColumnDialog();
+                break;
+
+            case R.id.fabAddRow:
+                ArrayList<String> data = new ArrayList<>();
+                for (int i=0; i<columnList.size(); i++)
+                    data.add("");
+                tableData.add(data);
+                setRecyclerView(tableData, columnList);
                 break;
         }
     }

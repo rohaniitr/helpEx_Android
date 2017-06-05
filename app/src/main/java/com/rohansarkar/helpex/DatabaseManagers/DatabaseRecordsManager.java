@@ -20,12 +20,12 @@ import Assets.Util;
  */
 public class DatabaseRecordsManager {
 
-    String LOG_TAG= "DatabaseManagerRecords Logs";
+    String LOG_TAG= this.getClass().getSimpleName();
     public static final String KEY_EXPERIMENT_ID = "experiment_id";
     public static final String KEY_RECORD_ID = "record_id";
     public static final String KEY_RECORD = "record";
 
-    private static final String DATABASE_NAME = "helpEx";
+    private static final String DATABASE_NAME = "helpEx_records";
     private static final String TABLE_EXPERIMENT_RECORDS = "ExperimentRecords";
     private static final int DATABASE_VERSION = 1;
 
@@ -34,8 +34,6 @@ public class DatabaseRecordsManager {
     private SQLiteDatabase ourDatabase, ourDbRecords;
 
     private static class DbHelper extends SQLiteOpenHelper {
-
-        private Util.DatabaseType databaseType;
 
         public DbHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -71,7 +69,7 @@ public class DatabaseRecordsManager {
         ourHelper.close();
     }
 
-    public long createEntry(DataRecord data) {
+    public long createRecord(DataRecord data) {
         ContentValues cv = new ContentValues();
         cv.put(KEY_EXPERIMENT_ID, data.experimentID);
         cv.put(KEY_RECORD, data.record);
@@ -80,22 +78,41 @@ public class DatabaseRecordsManager {
         return ourDatabase.insert(TABLE_EXPERIMENT_RECORDS, null, cv);
     }
 
-    public ArrayList<DataRecord> getExperimentDetails(){
+    public ArrayList<DataRecord> getRecords(int experimentID){
         String[] columns = new String[]{KEY_RECORD_ID, KEY_EXPERIMENT_ID, KEY_RECORD};
-        Cursor c = ourDatabase.query(TABLE_EXPERIMENT_RECORDS, columns, null, null, null, null, null);
+        String query = "SELECT * FROM " + TABLE_EXPERIMENT_RECORDS + " WHERE " + KEY_EXPERIMENT_ID + " = " + experimentID;
+        Cursor c = ourDatabase.rawQuery(query, null);
 
-        ArrayList<DataRecord> experimentDetails= new ArrayList<>();
-        int iRowId = c.getColumnIndex(KEY_RECORD_ID);
+        ArrayList<DataRecord> experimentRecords= new ArrayList<>();
+        int iRecordId = c.getColumnIndex(KEY_RECORD_ID);
         int IExperimentId = c.getColumnIndex(KEY_EXPERIMENT_ID);
         int iRecord = c.getColumnIndex(KEY_RECORD);
 
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-            DataRecord data = new DataRecord(c.getInt(iRowId), c.getInt(IExperimentId), c.getString(iRecord));
-            experimentDetails.add(data);
-            Log.d(LOG_TAG, "Entry Id: " + c.getInt(iRowId) + " : " + c.getString(iRecord));
+            DataRecord data = new DataRecord(c.getInt(iRecordId), c.getInt(IExperimentId), c.getString(iRecord));
+            experimentRecords.add(data);
+            Log.d(LOG_TAG, "Record Id: " + c.getInt(iRecordId) + " : " + c.getString(iRecord));
         }
 
-        Log.d(LOG_TAG, "Size: " + experimentDetails.size());
-        return experimentDetails;
+        return experimentRecords;
+    }
+
+    public int updateRecord(DataRecord data){
+        try {
+            ContentValues cvUpdate = new ContentValues();
+            cvUpdate.put(KEY_EXPERIMENT_ID, data.experimentID);
+            cvUpdate.put(KEY_RECORD, data.record);
+            Log.d(LOG_TAG, "Updating : " + data.recordId);
+            return ourDatabase.update(TABLE_EXPERIMENT_RECORDS, cvUpdate, KEY_RECORD_ID + "=" + data.recordId, null);
+        }
+        catch (Exception e){
+            Log.d(LOG_TAG, "Update for recordId : " +  data.recordId + " failed.");
+        }
+        return -1;
+    }
+
+    public void deleteRecord(long recordId){
+        ourDatabase.delete(TABLE_EXPERIMENT_RECORDS, KEY_RECORD_ID + "=" + recordId, null);
+        Log.d(LOG_TAG, "Deleted : " + recordId);
     }
 }
