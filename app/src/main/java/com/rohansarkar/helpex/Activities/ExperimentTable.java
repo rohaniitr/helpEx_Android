@@ -109,24 +109,34 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         if (tableData.size() >= experimentRecords.size()){
             for (int i=0; i< experimentRecords.size(); i++){
                 experimentRecords.get(i).record = Util.getString(tableData.get(i), "~");
-                Log.d(LOG_TAG,  "Record[" + i + "] : " + experimentRecords.get(i).recordId);
-                recordsManager.updateRecord(experimentRecords.get(i));
+
+                //Update in database if row is non-empty. Delete otherwise.
+                if(isEmptyRow(experimentRecords.get(i).record))
+                    recordsManager.updateRecord(experimentRecords.get(i));
+                else
+                    recordsManager.deleteRecord(experimentRecords.get(i).recordId);
             }
 
             for (int i = experimentRecords.size(); i<tableData.size(); i++){
                 DataRecord dataRecord = new DataRecord(experimentData.experimentID, Util.getString(tableData.get(i), "~"));
-                Log.d(LOG_TAG,  "Record[" + i + "] : " + dataRecord.recordId);
-                recordsManager.createRecord(dataRecord);
+
+                //Save in database if row is non-empty.
+                if(isEmptyRow(dataRecord.record))
+                    recordsManager.createRecord(dataRecord);
             }
         }
         else {
             for (int i=0; i< tableData.size(); i++){
                 experimentRecords.get(i).record = Util.getString(tableData.get(i), "~");
-                Log.d(LOG_TAG,  "Record[" + i + "] : " + experimentRecords.get(i).recordId);
-                recordsManager.updateRecord(experimentRecords.get(i));
+
+                //Update in database if row is non-empty. Delete otherwise.
+                if (isEmptyRow(experimentRecords.get(i).record))
+                    recordsManager.updateRecord(experimentRecords.get(i));
+                else
+                    recordsManager.deleteRecord(experimentRecords.get(i).recordId);
             }
 
-            for (int i = tableData.size(); i<tableData.size(); i++){;
+            for (int i = tableData.size(); i<experimentRecords.size(); i++){;
                 recordsManager.deleteRecord(experimentRecords.get(i).recordId);
             }
         }
@@ -165,7 +175,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         tableRecyclerView.setHasFixedSize(true);
 
         tableAdapter = new TableCellAdapter(tableData,columnList, this);
-        tableRecyclerView.computedWidth = getRecyclerWidth();
+        tableRecyclerView.computedWidth = getTableWidth();
         tableRecyclerView.setAdapter(tableAdapter);
 
         rowAdapter = new TableRowNoAdapter(tableData.size(), this);
@@ -190,7 +200,6 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         tableLayout = (RelativeLayout) findViewById(R.id.rlTableLayout);
         headerPadding = (ImageView) findViewById(R.id.ivHeaderPadding);
         addRow = (FloatingActionButton) findViewById(R.id.fabAddRow);
-        addRow.setVisibility(View.GONE);
 
         rowLayoutManager = new LinearLayoutManager(this);
         rowLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -608,9 +617,18 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    private int getRecyclerWidth(){
+    private int getTableWidth(){
         float sp = (getResources().getDimension(R.dimen.custom_table_cell_width) * columnList.size());
         return (int)sp;
+    }
+
+    //Checks for empty rows.
+    private boolean isEmptyRow(String rowString){
+        for(int i=0; i<10; i++){
+            if(rowString.contains(i+""))
+                return true;
+        }
+        return  false;
     }
 
     //EVENT Class.

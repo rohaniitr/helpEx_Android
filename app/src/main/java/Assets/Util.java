@@ -48,15 +48,12 @@ public class Util {
 
     public static String getString(ArrayList<String> contentList, String symbol){
         String s = "";
-        for(int i=0; i<contentList.size(); i++)
-            s+= contentList.get(i) + " ";
-        Log.d(LOG_TAG, "Content Size : " + contentList.size() + " - " + s);
 
         if (contentList.size()<=0)
             return s;
 
         s = contentList.get(0);
-        for (int i=0; i<contentList.size(); i++)
+        for (int i=1; i<contentList.size(); i++)
             s += symbol + contentList.get(i);
 
         Log.d(LOG_TAG, "s : " + s);

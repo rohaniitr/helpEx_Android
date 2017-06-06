@@ -10,17 +10,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.Pair;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.data.Entry;
 import com.rohansarkar.helpex.Adapters.PlotGraphAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
+import com.rohansarkar.helpex.CustomData.DataGraph;
+import com.rohansarkar.helpex.CustomData.DataRecord;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseEperimentManager;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseRecordsManager;
 import com.rohansarkar.helpex.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import Assets.Util;
@@ -31,19 +37,22 @@ import Assets.Util;
 public class PlotGraph extends AppCompatActivity{
 
     private final String LOG_TAG = getClass().getSimpleName();
-    RecyclerView recyclerView;
-    RecyclerView.Adapter adapter;
-    LinearLayoutManager layoutManager;
-    CoordinatorLayout layout;
-    Toolbar toolbar;
-    TextView toolbarTitle;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private LinearLayoutManager layoutManager;
+    private CoordinatorLayout layout;
+    private Toolbar toolbar;
+    private TextView toolbarTitle;
+
+    private DatabaseRecordsManager recordsManager;
     private DatabaseEperimentManager detailsManager;
 
+    private ArrayList<ArrayList<String>> tableData;
     private ArrayList<Pair<String,String>> graphList;
     private ArrayList<ArrayList<String>> xValues;
     private ArrayList<ArrayList<Entry>> yValues;
-    DataExperiment experimentData;
-    ArrayList<String> columnList;
+    private DataExperiment experimentData;
+    private ArrayList<String> columnList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,6 +62,7 @@ public class PlotGraph extends AppCompatActivity{
         init();
         getData();
         setToolbar();
+        structureGraphData();
         setRecyclerView(yValues, xValues, graphList);
     }
 
@@ -60,9 +70,57 @@ public class PlotGraph extends AppCompatActivity{
     protected void onDestroy() {
         super.onDestroy();
         detailsManager.close();
+        recordsManager.close();
+    }
+
+    private void structureGraphData(){
+        for(int i=0; i<graphList.size(); i++){
+            int xPos = columnList.indexOf(graphList.get(i).first);
+            int yPos = columnList.indexOf(graphList.get(i).second);
+            ArrayList<DataGraph> graphData = new ArrayList<>();
+
+            for(int j=0; j<tableData.size(); j++){
+                try{
+                    int x = Integer.parseInt(tableData.get(j).get(xPos));
+                    float y = Float.parseFloat(tableData.get(j).get(yPos));
+                    graphData.add(new DataGraph(tableData.get(j).get(xPos), y));
+                }
+                catch (Exception e){
+                    Log.d(LOG_TAG, "Ignoring Row : " + j + " - (" +
+                            tableData.get(j).get(xPos) + ", " + tableData.get(j).get(yPos) + ")");
+                }
+            }
+
+            //Draw Graph if list has more than one Point.
+            if(graphData.size() >=2){
+                //Sort as per X-axis.
+                Collections.sort(graphData);
+                ArrayList<String> xData = new ArrayList<>();
+                ArrayList<Entry> yData = new ArrayList<>();
+
+                for(int j=0; j<graphData.size(); j++){
+                    Log.d(LOG_TAG, "GraphData [" + j + "] : " + graphData.get(j).x + ", " + graphData.get(j).y);
+                    xData.add(graphData.get(j).x);
+                    yData.add(new Entry(graphData.get(j).y, Integer.parseInt(graphData.get(j).x)));
+                }
+
+                xValues.add(xData);
+                yValues.add(yData);
+            }
+            else {
+                //Remove from the graphList to be plotted.
+                graphList.remove(i);
+            }
+        }
+
+        if(xValues.size()<=0 || yValues.size()<=0){
+            Toast.makeText(this, "Insufficient data for the Graph(s).", Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 
     private void getData(){
+        //Get details of Graph(s) to o be plotted.
         int size = getIntent().getIntExtra(Util.GRAPH_LIST_SIZE, -1);
 
         for(int i=0; i<size; i++){
@@ -70,35 +128,17 @@ public class PlotGraph extends AppCompatActivity{
             graphList.add(new Pair<String, String>(temp.get(0), temp.get(1)));
         }
 
+        //Get Experiment Details.
         long rowId = getIntent().getLongExtra(Util.EXPERIMENT_ID, -1);
         experimentData = detailsManager.getExperimentDetails(rowId);
         columnList = Util.splitString(experimentData.columnNames, "~");
 
-        Random r = new Random();
+        //Get Record Data from Database.
+        ArrayList<DataRecord> experimentRecords = recordsManager.getRecords((int)experimentData.experimentID);
 
-        ArrayList<String> xData = new ArrayList<>();
-        ArrayList<Entry> yData = new ArrayList<>();
-        for(int i=0; i<100; i++) {
-            xData.add(i+"");
-            yData.add(new Entry((float)Math.sin(i), i));
-        }
-        xValues.add(xData);
-        yValues.add(yData);
-
-        ArrayList<String> x = new ArrayList<>();
-        for(int i=0; i<20; i++){
-            x.add(i+"");
-        }
-
-        for(int i=0; i<5; i++){
-            ArrayList<Entry> y = new ArrayList<>();
-            int val = 10;
-            for(int j=0; j<20; j++){
-                y.add(new Entry(r.nextInt(val) + r.nextFloat(), j));
-            }
-            yValues.add(y);
-            xValues.add(x);
-            val = val*10;
+        for (int i=0; i<experimentRecords.size(); i++){
+            ArrayList<String> rowData = Util.splitString(experimentRecords.get(i).record, "~");
+            tableData.add(rowData);
         }
     }
 
@@ -114,9 +154,12 @@ public class PlotGraph extends AppCompatActivity{
         xValues = new ArrayList<>();
         graphList = new ArrayList<>();
         columnList = new ArrayList<>();
+        tableData = new ArrayList<>();
 
         detailsManager = new DatabaseEperimentManager(this);
+        recordsManager = new DatabaseRecordsManager(this);
         detailsManager.open();
+        recordsManager.open();
     }
 
     private void setRecyclerView(ArrayList<ArrayList<Entry>> yValues, ArrayList<ArrayList<String>> xValues,

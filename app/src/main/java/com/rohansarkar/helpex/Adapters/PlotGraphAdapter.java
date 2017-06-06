@@ -59,6 +59,7 @@ public class PlotGraphAdapter extends RecyclerView.Adapter<PlotGraphAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.title.setText(graphList.get(position).first + " vs " + graphList.get(position).second);
+//        holder.lineChart.s/
 
         // create a dataset and give it a type
         LineDataSet set = new LineDataSet(yValues.get(position), "DataSet " + position);
@@ -72,7 +73,7 @@ public class PlotGraphAdapter extends RecyclerView.Adapter<PlotGraphAdapter.View
         set.setCircleColor(Color.BLACK);
         set.setLineWidth(1f);
         set.setCircleRadius(3f);
-        set.setDrawCircleHole(false);
+        set.setDrawCircleHole(true);
         set.setValueTextSize(9f);
         set.setDrawFilled(true);
 

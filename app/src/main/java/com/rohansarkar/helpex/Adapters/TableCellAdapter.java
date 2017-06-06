@@ -29,11 +29,15 @@ public class TableCellAdapter extends RecyclerView.Adapter<TableCellAdapter.View
     public class ViewHolder extends RecyclerView.ViewHolder{
         EditText cell;
         RelativeLayout elementLayout;
+        CellListener cellListener;
 
-        public ViewHolder(View v) {
+        public ViewHolder(View v, CellListener cellListener) {
             super(v);
             cell = (EditText) v.findViewById(R.id.etTableCell);
             elementLayout = (RelativeLayout) v.findViewById(R.id.rlTableCell);
+
+            this.cellListener = cellListener;
+            cell.addTextChangedListener(cellListener);
         }
     }
 
@@ -46,28 +50,14 @@ public class TableCellAdapter extends RecyclerView.Adapter<TableCellAdapter.View
     @Override
     public TableCellAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.element_table_cell, parent, false);
-        ViewHolder vh = new ViewHolder(v);
+        ViewHolder vh = new ViewHolder(v, new CellListener());
         return vh;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
+        holder.cellListener.updatePosition(position);
         holder.cell.setText(tableData.get(position/columnList.size()).get(position%columnList.size()));
-
-        //To save data to tableView dynamically.
-        holder.cell.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-                tableData.get(position/columnList.size()).set(position%columnList.size(), charSequence.toString());
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-            }
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
     }
 
     @Override
@@ -76,18 +66,30 @@ public class TableCellAdapter extends RecyclerView.Adapter<TableCellAdapter.View
     }
 
     /*
-    **Logic Implementation.
-    * */
-
-     /*
-    **Database Interface.
-    * */
-
-    /*
     **Display Assets..
     * */
 
     private void showToast(String message){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private class CellListener implements TextWatcher{
+        private int position;
+
+        public void updatePosition(int position){
+            this.position = position;
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            tableData.get(position/columnList.size()).set(position%columnList.size(), charSequence.toString());
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+        }
+        @Override
+        public void afterTextChanged(Editable editable) {
+        }
     }
 }
