@@ -1,3 +1,5 @@
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/rohaniitr/helpEx_Android)
+
 ## helpEx for Android
 
 This project is an Android application for assisting students in recording their Experimental Data, usually for _Academic purposes_.
