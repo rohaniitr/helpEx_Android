@@ -704,6 +704,8 @@ int id popup_delete 0x7f0c00bb
 int id popup_edit 0x7f0c00bc
 int id popup_export_details 0x7f0c00ba
 int id popup_plot_graph 0x7f0c00b9
+int id popup_save_graph 0x7f0c00bf
+int id popup_save_graphs 0x7f0c00be
 int id progress_circular 0x7f0c0006
 int id progress_horizontal 0x7f0c0007
 int id radio 0x7f0c0054
@@ -861,6 +863,8 @@ int menu drawer_container 0x7f0d0000
 int menu popup_experiment_table 0x7f0d0001
 int menu popup_home_element_experiment 0x7f0d0002
 int menu popup_home_toolbar 0x7f0d0003
+int menu popup_plot_graph 0x7f0d0004
+int menu popup_plot_graph_element 0x7f0d0005
 int raw gtm_analytics 0x7f050000
 int string abc_action_bar_home_description 0x7f060000
 int string abc_action_bar_home_description_format 0x7f06002d

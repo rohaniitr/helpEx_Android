@@ -8,11 +8,23 @@
         android:layout_width="match_parent" android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <Assets.TextViewCaviarDreams
+        <RelativeLayout
             android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-            android:id="@+id/tvGraphTitle" android:gravity="center"
-            android:textColor="#eeeeee" android:textSize="32sp"
-            android:background="@color/custom_dialog_button_background"/>
+            android:background="@color/custom_dialog_button_background">
+
+            <ImageView
+                android:layout_width="32sp" android:layout_height="32sp"
+                android:id="@+id/ivOverflowMenu" android:background="@drawable/icon_more_vert"
+                android:layout_alignParentRight="true" android:layout_centerVertical="true"
+                android:backgroundTint="#eeeeee" android:layout_marginRight="16sp"/>
+
+            <Assets.TextViewCaviarDreams
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:id="@+id/tvGraphTitle" android:gravity="center"
+                android:textColor="#eeeeee" android:textSize="32sp"
+                android:layout_toLeftOf="@+id/ivOverflowMenu"/>
+
+        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent" android:layout_height="match_parent"

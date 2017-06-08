@@ -1,11 +1,18 @@
 package com.rohansarkar.helpex.Activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,7 +34,6 @@ import com.rohansarkar.helpex.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import Assets.Util;
 
@@ -51,7 +57,7 @@ public class PlotGraph extends AppCompatActivity{
     private ArrayList<Pair<String,String>> graphList;
     private ArrayList<ArrayList<String>> xValues;
     private ArrayList<ArrayList<Entry>> yValues;
-    private DataExperiment experimentData;
+    private DataExperiment experimentDetails;
     private ArrayList<String> columnList;
 
     @Override
@@ -130,11 +136,11 @@ public class PlotGraph extends AppCompatActivity{
 
         //Get Experiment Details.
         long rowId = getIntent().getLongExtra(Util.EXPERIMENT_ID, -1);
-        experimentData = detailsManager.getExperimentDetails(rowId);
-        columnList = Util.splitString(experimentData.columnNames, "~");
+        experimentDetails = detailsManager.getExperimentDetails(rowId);
+        columnList = Util.splitString(experimentDetails.columnNames, "~");
 
         //Get Record Data from Database.
-        ArrayList<DataRecord> experimentRecords = recordsManager.getRecords((int)experimentData.experimentID);
+        ArrayList<DataRecord> experimentRecords = recordsManager.getRecords((int) experimentDetails.experimentID);
 
         for (int i=0; i<experimentRecords.size(); i++){
             ArrayList<String> rowData = Util.splitString(experimentRecords.get(i).record, "~");
@@ -164,7 +170,7 @@ public class PlotGraph extends AppCompatActivity{
 
     private void setRecyclerView(ArrayList<ArrayList<Entry>> yValues, ArrayList<ArrayList<String>> xValues,
                                  ArrayList<Pair<String,String>> graphList){
-        adapter = new PlotGraphAdapter(yValues, xValues, graphList, this);
+        adapter = new PlotGraphAdapter(yValues, xValues, graphList, experimentDetails, this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -179,7 +185,64 @@ public class PlotGraph extends AppCompatActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         toolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
-        toolbarTitle.setText(experimentData.title);
+        toolbarTitle.setText(experimentDetails.title);
+    }
+
+    //Permission UX.
+    private String[] permissionString = {"android.permission.WRITE_EXTERNAL_STORAGE"};
+    private int PERMISSION_REQUEST_CODE = 3257;
+
+    private boolean checkPerission(){
+        return ContextCompat.checkSelfPermission(this, permissionString[0]) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermission(){
+        ActivityCompat.requestPermissions(this, permissionString, PERMISSION_REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == PERMISSION_REQUEST_CODE){
+
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                //Permission Granted
+                showToast("Permission Granted . . .");
+            }
+            else{
+                //Permission not granted.
+                if(Build.VERSION.SDK_INT >= Util.MARSHMALLOW){
+                   if(ActivityCompat.shouldShowRequestPermissionRationale(this,  permissions[0])){
+                       //Explain why you need the permission. Ask for permission again if user agrees.
+                       createPermissionAlertBox();
+                   }
+                }
+            }
+
+        }
+    }
+
+    private void createPermissionAlertBox(){
+        DialogInterface.OnClickListener okListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(Build.VERSION.SDK_INT >= Util.MARSHMALLOW){
+                    requestPermission();
+                }
+            }
+        };
+
+        new AlertDialog.Builder(this).
+                setTitle("Permission for saving Graphs.").
+                setMessage("Please accept the permission for saving the Graphs.").
+                setPositiveButton("Ok", okListener).
+                setNegativeButton("Cancel",  null).
+                create().
+                show();
+    }
+
+    private void showToast(String message){
+        Toast.makeText(this,  message, Toast.LENGTH_SHORT).show();
     }
 
     @Override

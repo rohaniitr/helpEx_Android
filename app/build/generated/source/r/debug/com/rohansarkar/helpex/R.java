@@ -2365,6 +2365,8 @@ containing a value of this type.
         public static final int popup_edit=0x7f0c00bc;
         public static final int popup_export_details=0x7f0c00ba;
         public static final int popup_plot_graph=0x7f0c00b9;
+        public static final int popup_save_graph=0x7f0c00bf;
+        public static final int popup_save_graphs=0x7f0c00be;
         public static final int progress_circular=0x7f0c0006;
         public static final int progress_horizontal=0x7f0c0007;
         public static final int radio=0x7f0c0054;
@@ -2528,6 +2530,8 @@ containing a value of this type.
         public static final int popup_experiment_table=0x7f0d0001;
         public static final int popup_home_element_experiment=0x7f0d0002;
         public static final int popup_home_toolbar=0x7f0d0003;
+        public static final int popup_plot_graph=0x7f0d0004;
+        public static final int popup_plot_graph_element=0x7f0d0005;
     }
     public static final class raw {
         public static final int gtm_analytics=0x7f050000;

@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -46,10 +47,17 @@ import com.rohansarkar.helpex.DatabaseManagers.DatabaseEperimentManager;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseRecordsManager;
 import com.rohansarkar.helpex.R;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import Assets.SmartRecyclerView;
 import Assets.Util;
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
 
 /**
  * Created by rohan on 11/5/17.
@@ -74,7 +82,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
     DatabaseEperimentManager detailsManager;
     DatabaseRecordsManager recordsManager;
-    DataExperiment experimentData;              //Data about Experiment selected.
+    DataExperiment experimentDetails;            //Data about Experiment selected.
     ArrayList<String> columnList;               //Contains Column List.
     ArrayList<String> prevColumnList;           //Contains Just Previous Column List. Required while shifting Columns.
     ArrayList<ArrayList<String>> tableData;     //Contains 2D Table Data.
@@ -106,12 +114,12 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         //Get Row ID of Experiment.
         rowId = getIntent().getLongExtra("rowId", -1);
         //Get Details of the Experiment.
-        experimentData = detailsManager.getExperimentDetails(rowId);
-        columnList = getColumnList(experimentData.columnNames);
+        experimentDetails = detailsManager.getExperimentDetails(rowId);
+        columnList = getColumnList(experimentDetails.columnNames);
         Log.d(LOG_TAG, "ColumnList Size : " + columnList.size());
 
         //Get experimentRecords of the experiment.
-        experimentRecords = recordsManager.getRecords((int)experimentData.experimentID);
+        experimentRecords = recordsManager.getRecords((int) experimentDetails.experimentID);
         tableData.clear();
         for (int i=0; i< experimentRecords.size(); i++){
             tableData.add(Util.splitString(experimentRecords.get(i).record, "~"));
@@ -130,7 +138,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         tableRecyclerView.setLayoutManager(tableLayoutManager);
         tableRecyclerView.setHasFixedSize(true);
 
-        tableAdapter = new TableCellAdapter(experimentData, experimentRecords, tableData, columnList, recordsManager,  this);
+        tableAdapter = new TableCellAdapter(experimentDetails, experimentRecords, tableData, columnList, recordsManager,  this);
         tableRecyclerView.computedWidth = getTableWidth();
         tableRecyclerView.setAdapter(tableAdapter);
 
@@ -189,6 +197,11 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
+                //For null parent issue when View  is recycled.
+                View currentFocus = getCurrentFocus();
+                if(currentFocus != null)
+                    currentFocus.clearFocus();
+
                 if(recyclerView == tableRecyclerView){
                     //Remove ScrollListener from other RecyclerView before programatically Scrolling.
                     //Else, will end up in LOOP.
@@ -224,7 +237,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         overflowMenu.setOnClickListener(this);
 
         toolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
-        toolbarTitle.setText(experimentData.title);
+        toolbarTitle.setText(experimentDetails.title);
     }
 
     @Override
@@ -244,7 +257,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                             launchPlotGraphDialog();
                         }
                         else if(menuItem.getItemId() == R.id.popup_export_details){
-                            showToast("Export Details");
+                            exportTableAsExcel();
                         }
                         return false;
                     }
@@ -456,11 +469,11 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
     //Database APIs
     private void updateColumns(ArrayList<String> columnNames){
-        experimentData.columnNames = getColumnString(columnNames);
+        experimentDetails.columnNames = getColumnString(columnNames);
         prevColumnList = columnList;
         columnList = columnNames;
-        Log.d(LOG_TAG, "columnNames: " + experimentData.columnNames + "columnNames.size : " + columnNames.size());
-        detailsManager.updateEntry(experimentData);
+        Log.d(LOG_TAG, "columnNames: " + experimentDetails.columnNames + "columnNames.size : " + columnNames.size());
+        detailsManager.updateEntry(experimentDetails);
         //Show Table if Columns present in  table.
         setLayoutVisibility();
         //Update the table.
@@ -580,8 +593,68 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         for (int i=0; i<columnList.size(); i++)
             data.add("");
         tableData.add(data);
-        experimentRecords.add(new DataRecord(experimentData.experimentID, Util.getString(data, "~")));
+        experimentRecords.add(new DataRecord(experimentDetails.experimentID, Util.getString(data, "~")));
         setRecyclerView(tableData, columnList);
+    }
+
+    //Creates Excel File & Save Data.
+    private void exportTableAsExcel(){
+        if(!createFolder()){
+            showToast("Unable to export Excel file. Storage permission error.");
+            return;
+        }
+
+        File excelDirectory = new File(Environment.getExternalStorageDirectory().toString() + File.separator +
+                getString(R.string.app_name) +  File.separator + experimentDetails.title.replace(" ", ""));
+
+        try {
+            File file = new File(excelDirectory, experimentDetails.title.replace(" ","") + ".xls");
+            WorkbookSettings wbSettings = new WorkbookSettings();
+            wbSettings.setLocale(new Locale("en", "EN"));
+            WritableWorkbook workbook;
+            workbook = Workbook.createWorkbook(file, wbSettings);
+            //Excel sheet name. 0 represents first sheet
+            WritableSheet sheet = workbook.createSheet(experimentDetails.title.replace(" ", ""), 0);
+            // column and row
+            for(int i=0; i<columnList.size(); i++){
+                sheet.addCell(new Label(i,0,columnList.get(i)));
+            }
+
+            for(int i=0; i<tableData.size(); i++){
+                for(int j=0; j<columnList.size(); j++){
+                    sheet.addCell(new Label(j, i+1, tableData.get(i).get(j)));
+                }
+            }
+
+            //Closing Workbook
+            workbook.write();
+            workbook.close();
+            showToast("Data Exported in a Excel Sheet");
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    //Checks & Creates Folder for saving Files for this experiment.
+    private boolean createFolder(){
+        File folder = new File(Environment.getExternalStorageDirectory().toString() + "/" + getString(R.string.app_name));
+
+        boolean folderCreated = true;
+        if(!folder.exists()){
+            folderCreated = folder.mkdir();
+        }
+
+        if(!folderCreated)
+            return false;
+
+        File innerFolder = new File(Environment.getExternalStorageDirectory().toString() + File.separator +
+                getString(R.string.app_name) +  File.separator + experimentDetails.title.replace(" ", ""));
+
+        if(!innerFolder.exists()){
+            folderCreated = innerFolder.mkdir();
+        }
+        return folderCreated;
     }
 
     //EVENT Class.
