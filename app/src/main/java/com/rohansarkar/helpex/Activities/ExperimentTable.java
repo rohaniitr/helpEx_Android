@@ -61,7 +61,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     RecyclerView headerRecyclerView;
     RecyclerView.Adapter tableAdapter, headerAdapter, rowAdapter;
     LinearLayoutManager tableLayoutManager, headerLayoutManager, rowLayoutManager;
-    RecyclerView.OnScrollListener rvScrollListener;
+    RecyclerView.OnScrollListener tableScrollListener;
     FloatingActionButton addRow;
     CoordinatorLayout layout;
     Toolbar toolbar;
@@ -97,49 +97,9 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onDestroy() {
-        //Save data first. Then destroy instances.
-        saveData();
-
         super.onDestroy();
         detailsManager.close();
         recordsManager.close();
-    }
-
-    public void saveData(){
-        if (tableData.size() >= experimentRecords.size()){
-            for (int i=0; i< experimentRecords.size(); i++){
-                experimentRecords.get(i).record = Util.getString(tableData.get(i), "~");
-
-                //Update in database if row is non-empty. Delete otherwise.
-                if(isEmptyRow(experimentRecords.get(i).record))
-                    recordsManager.updateRecord(experimentRecords.get(i));
-                else
-                    recordsManager.deleteRecord(experimentRecords.get(i).recordId);
-            }
-
-            for (int i = experimentRecords.size(); i<tableData.size(); i++){
-                DataRecord dataRecord = new DataRecord(experimentData.experimentID, Util.getString(tableData.get(i), "~"));
-
-                //Save in database if row is non-empty.
-                if(isEmptyRow(dataRecord.record))
-                    recordsManager.createRecord(dataRecord);
-            }
-        }
-        else {
-            for (int i=0; i< tableData.size(); i++){
-                experimentRecords.get(i).record = Util.getString(tableData.get(i), "~");
-
-                //Update in database if row is non-empty. Delete otherwise.
-                if (isEmptyRow(experimentRecords.get(i).record))
-                    recordsManager.updateRecord(experimentRecords.get(i));
-                else
-                    recordsManager.deleteRecord(experimentRecords.get(i).recordId);
-            }
-
-            for (int i = tableData.size(); i<experimentRecords.size(); i++){;
-                recordsManager.deleteRecord(experimentRecords.get(i).recordId);
-            }
-        }
     }
 
     private void getData(){
@@ -157,11 +117,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
             tableData.add(Util.splitString(experimentRecords.get(i).record, "~"));
         }
 
-        //Dummy Variable at last.
-        ArrayList<String> data= new ArrayList<>();
-        for (int i=0; i<columnList.size(); i++)
-            data.add("");
-        tableData.add(data);
+        addEmptyRow();
     }
 
     private void setRecyclerView(ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList){
@@ -174,7 +130,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         tableRecyclerView.setLayoutManager(tableLayoutManager);
         tableRecyclerView.setHasFixedSize(true);
 
-        tableAdapter = new TableCellAdapter(tableData,columnList, this);
+        tableAdapter = new TableCellAdapter(experimentData, experimentRecords, tableData, columnList, recordsManager,  this);
         tableRecyclerView.computedWidth = getTableWidth();
         tableRecyclerView.setAdapter(tableAdapter);
 
@@ -228,7 +184,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         headerRecyclerView.setHasFixedSize(true);
 
         //Table Scroll Listener.
-        rvScrollListener = new RecyclerView.OnScrollListener() {
+        tableScrollListener = new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -250,8 +206,8 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                 }
             }
         };
-        tableRecyclerView.addOnScrollListener(rvScrollListener);
-        rowRecyclerView.addOnScrollListener(rvScrollListener);
+        tableRecyclerView.addOnScrollListener(tableScrollListener);
+        rowRecyclerView.addOnScrollListener(tableScrollListener);
     }
 
     private void setToolbar(){
@@ -301,11 +257,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                 break;
 
             case R.id.fabAddRow:
-                ArrayList<String> data = new ArrayList<>();
-                for (int i=0; i<columnList.size(); i++)
-                    data.add("");
-                tableData.add(data);
-                setRecyclerView(tableData, columnList);
+                addEmptyRow();
                 break;
         }
     }
@@ -622,13 +574,14 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         return (int)sp;
     }
 
-    //Checks for empty rows.
-    private boolean isEmptyRow(String rowString){
-        for(int i=0; i<10; i++){
-            if(rowString.contains(i+""))
-                return true;
-        }
-        return  false;
+    //Adds Empty row to Table.
+    private void addEmptyRow(){
+        ArrayList<String> data = new ArrayList<>();
+        for (int i=0; i<columnList.size(); i++)
+            data.add("");
+        tableData.add(data);
+        experimentRecords.add(new DataRecord(experimentData.experimentID, Util.getString(data, "~")));
+        setRecyclerView(tableData, columnList);
     }
 
     //EVENT Class.

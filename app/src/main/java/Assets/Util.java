@@ -60,6 +60,15 @@ public class Util {
         return s;
     }
 
+    //Checks for empty rows.
+    public static boolean isEmptyRow(String rowString){
+        for(int i=0; i<10; i++){
+            if(rowString.contains(i+""))
+                return false;
+        }
+        return  true;
+    }
+
     //APIs for Soft Keyboard.
     private void showKeyboard(Context context){
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);

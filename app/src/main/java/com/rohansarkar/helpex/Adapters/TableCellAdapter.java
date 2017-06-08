@@ -12,16 +12,24 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.rohansarkar.helpex.CustomData.DataExperiment;
+import com.rohansarkar.helpex.CustomData.DataRecord;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseRecordsManager;
 import com.rohansarkar.helpex.R;
 
 import java.util.ArrayList;
+
+import Assets.Util;
 
 /**
  * Created by rohan on 23/5/17.
  */
 public class TableCellAdapter extends RecyclerView.Adapter<TableCellAdapter.ViewHolder>{
     private ArrayList<String> columnList;
+    DataExperiment experimentData;
+    ArrayList<DataRecord> experimentRecords;
     private ArrayList<ArrayList<String>> tableData;
+    DatabaseRecordsManager recordsManager;
     private Context context;
 
     String LOG_TAG= this.getClass().getSimpleName();
@@ -41,9 +49,14 @@ public class TableCellAdapter extends RecyclerView.Adapter<TableCellAdapter.View
         }
     }
 
-    public TableCellAdapter(ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList, Context context){
+    public TableCellAdapter(DataExperiment experimentData, ArrayList<DataRecord> experimentRecords,
+                            ArrayList<ArrayList<String>> tableData, ArrayList<String> columnList,
+                            DatabaseRecordsManager recordsManager, Context context){
+        this.experimentData = experimentData;
+        this.experimentRecords = experimentRecords;
         this.tableData = tableData;
         this.columnList = columnList;
+        this.recordsManager = recordsManager;
         this.context= context;
     }
 
@@ -73,6 +86,26 @@ public class TableCellAdapter extends RecyclerView.Adapter<TableCellAdapter.View
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
+    private void saveData(DataRecord dataRecord){
+        if (Util.isEmptyRow(dataRecord.record)){
+            if(dataRecord.recordId >= 0){
+                //Record exist in DB. Remove it.
+                recordsManager.deleteRecord(dataRecord.recordId);
+                dataRecord.recordId = -1;
+            }
+        }
+        else {
+            if(dataRecord.recordId < 0){
+                //Default Value. Create new Record.
+                dataRecord.recordId = recordsManager.createRecord(dataRecord);
+            }
+            else {
+                //Record already exists. Update it.
+                recordsManager.updateRecord(dataRecord);
+            }
+        }
+    }
+
     private class CellListener implements TextWatcher{
         private int position;
 
@@ -82,7 +115,11 @@ public class TableCellAdapter extends RecyclerView.Adapter<TableCellAdapter.View
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-            tableData.get(position/columnList.size()).set(position%columnList.size(), charSequence.toString());
+            int rowPos = position/columnList.size();
+            tableData.get(rowPos).set(position%columnList.size(), charSequence.toString());
+            experimentRecords.get(rowPos).record = Util.getString(tableData.get(rowPos), "~");
+
+            saveData(experimentRecords.get(rowPos));
         }
 
         @Override

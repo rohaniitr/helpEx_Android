@@ -1,12 +1,16 @@
 package com.rohansarkar.helpex.Adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +21,9 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.rohansarkar.helpex.R;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 /**
@@ -33,11 +40,13 @@ public class PlotGraphAdapter extends RecyclerView.Adapter<PlotGraphAdapter.View
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView title;
         LineChart lineChart;
+        RelativeLayout lineChartLayout;
 
         public ViewHolder(View v) {
             super(v);
             title = (TextView) v.findViewById(R.id.tvGraphTitle);
             lineChart = (LineChart) v.findViewById(R.id.lcPlotGraph);
+            lineChartLayout = (RelativeLayout) v.findViewById(R.id.rlLineChartLayout);
         }
     }
 
@@ -57,18 +66,20 @@ public class PlotGraphAdapter extends RecyclerView.Adapter<PlotGraphAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.title.setText(graphList.get(position).first + " vs " + graphList.get(position).second);
-//        holder.lineChart.s/
+
+        holder.title.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveImage(holder.lineChartLayout);
+            }
+        });
 
         // create a dataset and give it a type
         LineDataSet set = new LineDataSet(yValues.get(position), "DataSet " + position);
         set.setFillAlpha(110);
-        // set1.setFillColor(Color.RED);
 
-        // set the line to be drawn like this "- - - - - -"
-        // set1.enableDashedLine(10f, 5f, 0f);
-        // set1.enableDashedHighlightLine(10f, 5f, 0f);
         set.setColor(Color.BLACK);
         set.setCircleColor(Color.BLACK);
         set.setLineWidth(1f);
@@ -106,5 +117,29 @@ public class PlotGraphAdapter extends RecyclerView.Adapter<PlotGraphAdapter.View
 
     private void showToast(String message){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void saveImage(View view){
+        String imagePath = Environment.getExternalStorageDirectory().toString() + "/" + "helpEx.jpeg";
+        //Create bitmap image path.
+        view.setDrawingCacheEnabled(true);
+        Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
+        view.setDrawingCacheEnabled(false);
+
+        OutputStream fout = null;
+        File imageFile = new File(imagePath);
+
+        try {
+            fout = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90,  fout);
+            fout.flush();
+            fout.close();
+            Log.d(LOG_TAG, "Path : " + imagePath);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            Log.d(LOG_TAG, "Exception in saving image.");
+        }
+
     }
 }

@@ -17,9 +17,10 @@ public class DataRecord {
     public DataRecord(long experimentID, String record){
         this.experimentID = experimentID;
         this.record = record;
+        this.recordId = recordId;
     }
 
     public DataRecord() {
-
+        this.recordId = recordId;
     }
 }

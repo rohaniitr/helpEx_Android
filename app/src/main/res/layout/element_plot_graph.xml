@@ -14,9 +14,16 @@
             android:textColor="#eeeeee" android:textSize="32sp"
             android:background="@color/custom_dialog_button_background"/>
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:layout_height="match_parent" android:layout_width="match_parent"
-            android:id="@+id/lcPlotGraph" android:layout_margin="8sp"/>
+        <RelativeLayout
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:id="@+id/rlLineChartLayout" android:background="@android:color/white"
+            android:padding="8sp">
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:layout_height="match_parent" android:layout_width="match_parent"
+                android:id="@+id/lcPlotGraph"/>
+
+        </RelativeLayout>
 
     </LinearLayout>
 
