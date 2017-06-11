@@ -1,5 +1,6 @@
 package com.rohansarkar.helpex.Activities;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,6 +25,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
@@ -33,6 +35,19 @@ import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Font.FontFamily;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import com.rohansarkar.helpex.Adapters.GraphListAdapter;
 import com.rohansarkar.helpex.Adapters.GraphSelectAdapter;
@@ -47,7 +62,14 @@ import com.rohansarkar.helpex.DatabaseManagers.DatabaseEperimentManager;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseRecordsManager;
 import com.rohansarkar.helpex.R;
 
+import org.xml.sax.DocumentHandler;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -257,7 +279,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                             launchPlotGraphDialog();
                         }
                         else if(menuItem.getItemId() == R.id.popup_export_details){
-                            exportTableAsExcel();
+                            showExportOptions();
                         }
                         return false;
                     }
@@ -597,6 +619,96 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         setRecyclerView(tableData, columnList);
     }
 
+    //Create PDF File & Save Data.
+    private void exportTableAsPdf() {
+        if (!createFolder()) {
+            showToast("Unable to export PDF file. Storage permission error.");
+            return;
+        }
+
+        String root = Environment.getExternalStorageDirectory().toString() + File.separator +
+                getString(R.string.app_name) + File.separator + experimentDetails.title.replace(" ", "");
+
+        String pdfPath = root + File.separator + experimentDetails.title.replace(" ", "") + ".pdf";
+
+        Document doc = new Document();
+        PdfWriter docWriter = null;
+
+        try {
+            //Custom Fonts for PDF
+            Font fontTitle = new Font(FontFamily.TIMES_ROMAN, 30, Font.BOLD, new BaseColor(100, 100, 100));
+            Font fontTableHeading = new Font(FontFamily.TIMES_ROMAN, 20, Font.BOLD, new BaseColor(0, 0, 0));
+            Font fontTableContent = new Font(FontFamily.TIMES_ROMAN, 16);
+
+            //file path
+            docWriter = PdfWriter.getInstance(doc, new FileOutputStream(pdfPath));
+
+            //Add metadata
+            doc.addAuthor(getString(R.string.app_name));
+            doc.addCreationDate();
+            doc.addProducer();
+            doc.addCreator(getString(R.string.app_name));
+            doc.addTitle(experimentDetails.title);
+            doc.setPageSize(PageSize.A4);
+
+            doc.open();
+
+            //Paragraph = Heading + Table.
+            Paragraph pdfContent = new Paragraph(experimentDetails.title, fontTitle);
+            pdfContent.setAlignment(Element.ALIGN_CENTER);
+
+            //create PDF table with the given widths
+            PdfPTable table = new PdfPTable(columnList.size());
+            // set table width a percentage of the page width
+            table.setWidthPercentage(90f);
+
+            //Add Column Headings
+            for(int i=0; i<columnList.size(); i++){
+                insertCell(table, columnList.get(i), Element.ALIGN_CENTER, 1, fontTableHeading);
+            }
+
+            //Add Table Data
+            for (int i = 0; i < tableData.size(); i++) {
+                //Add non-empty rows only.
+                if(!Util.isEmptyRow(experimentRecords.get(i).record)) {
+                    for (int j = 0; j < columnList.size(); j++) {
+                        insertCell(table, tableData.get(i).get(j), Element.ALIGN_CENTER, 1, fontTableContent);
+                    }
+                }
+            }
+
+            pdfContent.add(table);
+            //Add the paragraph to the document
+            doc.add(pdfContent);
+            showToast("Data Successfully Exported to " + getString(R.string.app_name) + File.separator +
+                    experimentDetails.title.replace(" ", "") + File.separator + experimentDetails.title.replace(" ", "") + ".pdf");
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (doc != null) {
+                doc.close();
+            }
+            if (docWriter != null) {
+                docWriter.close();
+            }
+        }
+    }
+
+    private void insertCell(PdfPTable table, String text, int align, int colSpan, Font font){
+        PdfPCell cell = new PdfPCell(new Phrase(text.trim(), font));
+        cell.setHorizontalAlignment(align);
+        cell.setColspan(colSpan);
+
+        if(text.trim().equalsIgnoreCase("")){
+            cell.setMinimumHeight(10f);
+        }
+        table.addCell(cell);
+
+    }
+
     //Creates Excel File & Save Data.
     private void exportTableAsExcel(){
         if(!createFolder()){
@@ -621,15 +733,19 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
             }
 
             for(int i=0; i<tableData.size(); i++){
-                for(int j=0; j<columnList.size(); j++){
-                    sheet.addCell(new Label(j, i+1, tableData.get(i).get(j)));
+                //Add non-empty rows only.
+                if(!Util.isEmptyRow(experimentRecords.get(i).record)) {
+                    for (int j = 0; j < columnList.size(); j++) {
+                        sheet.addCell(new Label(j, i + 1, tableData.get(i).get(j)));
+                    }
                 }
             }
 
             //Closing Workbook
             workbook.write();
             workbook.close();
-            showToast("Data Exported in a Excel Sheet");
+            showToast("Data Successfully Exported to " + getString(R.string.app_name) + File.separator +
+                    experimentDetails.title.replace(" ", "") + File.separator + experimentDetails.title.replace(" ", "") + ".xls");
         }
         catch(Exception e){
             e.printStackTrace();
@@ -655,6 +771,42 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
             folderCreated = innerFolder.mkdir();
         }
         return folderCreated;
+    }
+
+    //Displays Export Options
+    private void showExportOptions(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(R.drawable.icon_more_vert);
+        builder.setTitle("Export as : ");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
+        adapter.add("PDF");
+        adapter.add("Excel");
+        adapter.add("CSV");
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switch (i){
+                    case 0:
+                        exportTableAsPdf();
+                        break;
+                    case 1:
+                        exportTableAsExcel();
+                        break;
+                    case 2:
+                        break;
+                }
+            }
+        });
+        builder.show();
     }
 
     //EVENT Class.

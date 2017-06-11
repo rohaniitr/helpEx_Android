@@ -30,8 +30,6 @@ dependencies {
     compile 'com.android.support:cardview-v7:21.0.+'
     compile 'com.android.support:recyclerview-v7:24.0.+'
 
-    compile files('libs/mpandroidchartlibrary-2-2-4.jar')
-    compile files('libs/jxl.jar')
     compile 'com.daimajia.easing:library:2.0@aar'
     compile 'com.daimajia.androidanimations:library:2.2@aar'
 }
