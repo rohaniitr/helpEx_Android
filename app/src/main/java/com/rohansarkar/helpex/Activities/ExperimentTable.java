@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -42,6 +44,7 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Font.FontFamily;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -49,6 +52,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import com.itextpdf.text.pdf.codec.Base64;
 import com.rohansarkar.helpex.Adapters.GraphListAdapter;
 import com.rohansarkar.helpex.Adapters.GraphSelectAdapter;
 import com.rohansarkar.helpex.Adapters.NewColumnAdapter;
@@ -65,10 +69,12 @@ import com.rohansarkar.helpex.R;
 import org.xml.sax.DocumentHandler;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -657,7 +663,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
             Paragraph pdfContent = new Paragraph(experimentDetails.title, fontTitle);
             pdfContent.setAlignment(Element.ALIGN_CENTER);
 
-            //create PDF table with the given widths
+            //Add table
             PdfPTable table = new PdfPTable(columnList.size());
             // set table width a percentage of the page width
             table.setWidthPercentage(90f);
@@ -678,8 +684,30 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
             }
 
             pdfContent.add(table);
+
             //Add the paragraph to the document
             doc.add(pdfContent);
+
+            //Add Image.
+            for(int i=1; i<4; i++){
+                Bitmap bmp = null;
+                if (i==1)
+                    bmp = BitmapFactory.decodeResource(getResources(), R.drawable.img1);
+                else if(i==2)
+                    bmp = BitmapFactory.decodeResource(getResources(), R.drawable.img2);
+                else if(i==3)
+                    bmp = BitmapFactory.decodeResource(getResources(), R.drawable.img3);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                Image signature;
+                signature = Image.getInstance(stream.toByteArray());
+                signature.setAlignment(Element.ALIGN_MIDDLE);
+                signature.scalePercent(100f);
+                signature.scaleAbsoluteWidth(350);
+                signature.scaleAbsoluteHeight(350);
+                doc.add(signature);
+            }
+
             showToast("Data Successfully Exported to " + getString(R.string.app_name) + File.separator +
                     experimentDetails.title.replace(" ", "") + File.separator + experimentDetails.title.replace(" ", "") + ".pdf");
 

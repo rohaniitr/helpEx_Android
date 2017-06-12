@@ -20,6 +20,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,7 +43,7 @@ import Assets.Util;
 /**
  * Created by rohan on 25/5/17.
  */
-public class PlotGraph extends AppCompatActivity{
+public class PlotGraph extends AppCompatActivity implements View.OnClickListener{
 
     private final String LOG_TAG = getClass().getSimpleName();
     private RecyclerView recyclerView;
@@ -49,6 +52,7 @@ public class PlotGraph extends AppCompatActivity{
     private CoordinatorLayout layout;
     private Toolbar toolbar;
     private TextView toolbarTitle;
+    ImageView overflowMenu;
 
     private DatabaseRecordsManager recordsManager;
     private DatabaseEperimentManager detailsManager;
@@ -150,6 +154,8 @@ public class PlotGraph extends AppCompatActivity{
 
     private void init(){
         recyclerView = (RecyclerView) findViewById(R.id.rvPlotGraph);
+        overflowMenu = (ImageView) findViewById(R.id.ivOverflowMenu);
+        overflowMenu.setOnClickListener(this);
 
         layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -251,5 +257,32 @@ public class PlotGraph extends AppCompatActivity{
             onBackPressed();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.ivOverflowMenu:
+                //Inflate and Show Toolbar popup.
+                PopupMenu toolbarMenu = new PopupMenu(this, overflowMenu);
+                toolbarMenu.getMenuInflater().inflate(R.menu.popup_plot_graph, toolbarMenu.getMenu());
+                toolbarMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        if(menuItem.getItemId() == R.id.popup_export){
+                            showToast("Export");
+                        }
+                        else if(menuItem.getItemId() == R.id.popup_redraw_graphs){
+                            showToast("Redraw");
+                        }
+                        else if(menuItem.getItemId() == R.id.popup_save_graphs){
+                            showToast("Save Graphs");
+                        }
+                        return false;
+                    }
+                });
+                toolbarMenu.show();
+                break;
+        }
     }
 }

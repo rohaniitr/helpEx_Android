@@ -19,7 +19,13 @@
                 android:id="@+id/tvToolbarTitle" android:layout_centerVertical="true"
                 android:textColor="#dddddd" android:textSize="32sp"
                 android:layout_alignParentLeft="true" android:ellipsize="end"
-                android:singleLine="true"/>
+                android:singleLine="true" android:layout_toLeftOf="@+id/ivOverflowMenu"/>
+
+            <ImageView
+                android:layout_width="32sp" android:layout_height="32sp"
+                android:background="@drawable/icon_more_vert" android:backgroundTint="#eeeeee"
+                android:id="@+id/ivOverflowMenu" android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"/>
 
         </RelativeLayout>
 

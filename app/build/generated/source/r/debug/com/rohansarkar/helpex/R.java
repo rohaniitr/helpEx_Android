@@ -2250,12 +2250,15 @@ containing a value of this type.
         public static final int icon_add_white=0x7f020058;
         public static final int icon_more_vert=0x7f020059;
         public static final int icon_tick_white=0x7f02005a;
-        public static final int notification_template_icon_bg=0x7f020060;
-        public static final int opaque_circle=0x7f02005b;
-        public static final int snackbar_background=0x7f02005c;
-        public static final int splash_screen=0x7f02005d;
-        public static final int star_hollow=0x7f02005e;
-        public static final int star_solid=0x7f02005f;
+        public static final int img1=0x7f02005b;
+        public static final int img2=0x7f02005c;
+        public static final int img3=0x7f02005d;
+        public static final int notification_template_icon_bg=0x7f020063;
+        public static final int opaque_circle=0x7f02005e;
+        public static final int snackbar_background=0x7f02005f;
+        public static final int splash_screen=0x7f020060;
+        public static final int star_hollow=0x7f020061;
+        public static final int star_solid=0x7f020062;
     }
     public static final class id {
         public static final int action0=0x7f0c00aa;
@@ -2363,10 +2366,12 @@ containing a value of this type.
         public static final int popup_add_experiment=0x7f0c00bd;
         public static final int popup_delete=0x7f0c00bb;
         public static final int popup_edit=0x7f0c00bc;
+        public static final int popup_export=0x7f0c00be;
         public static final int popup_export_details=0x7f0c00ba;
         public static final int popup_plot_graph=0x7f0c00b9;
-        public static final int popup_save_graph=0x7f0c00bf;
-        public static final int popup_save_graphs=0x7f0c00be;
+        public static final int popup_redraw_graphs=0x7f0c00bf;
+        public static final int popup_save_graph=0x7f0c00c1;
+        public static final int popup_save_graphs=0x7f0c00c0;
         public static final int progress_circular=0x7f0c0006;
         public static final int progress_horizontal=0x7f0c0007;
         public static final int radio=0x7f0c0054;
