@@ -25,7 +25,8 @@ import android.widget.Toast;
 
 import com.rohansarkar.helpex.Activities.ExperimentTable;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
-import com.rohansarkar.helpex.DatabaseManagers.DatabaseEperimentManager;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseExperimentManager;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseRecordsManager;
 import com.rohansarkar.helpex.R;
 
 import java.util.ArrayList;
@@ -39,7 +40,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder>{
     private Context context;
     private CoordinatorLayout layout;
     private RecyclerView recyclerView;
-    private DatabaseEperimentManager detailsManager;
+    private DatabaseExperimentManager detailsManager;
+    private DatabaseRecordsManager recordsManager;
 
     private ArrayList<DataExperiment> experiments;
     private boolean isFavourite;
@@ -63,12 +65,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder>{
     }
 
     public HomeAdapter(ArrayList<DataExperiment> experiments, Context context, CoordinatorLayout layout,RecyclerView recyclerView,
-                       DatabaseEperimentManager detailsManager, boolean isFavourite){
+                       DatabaseExperimentManager detailsManager, DatabaseRecordsManager recordsManager, boolean isFavourite){
         this.experiments= experiments;
         this.layout= layout;
         this.context= context;
         this.recyclerView= recyclerView;
         this.detailsManager = detailsManager;
+        this.recordsManager = recordsManager;
         this.isFavourite = isFavourite;
     }
 
@@ -140,8 +143,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder>{
                             showSnackBar("Deleted : " + experiments.get(position).title);
 
                             //Removed from list.
+                            recordsManager.deleteExperimentRecords(experiments.get(position).experimentID);
+                            notifyItemRemoved(position);
                             experiments.remove(position);
-                            notifyDataSetChanged();
                         }
                         else if(menuItem.getItemId() == R.id.popup_edit){
                             launchNewExperimentDialog(position);

@@ -1,9 +1,8 @@
 package com.rohansarkar.helpex.Adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
@@ -26,9 +25,9 @@ import com.rohansarkar.helpex.CustomData.DataExperiment;
 import com.rohansarkar.helpex.R;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
+
+import Assets.Util;
 
 /**
  * Created by rohan on 25/5/17.
@@ -38,6 +37,7 @@ public class PlotGraphAdapter extends RecyclerView.Adapter<PlotGraphAdapter.View
     private ArrayList<ArrayList<String>> xValues;
     private ArrayList<ArrayList<Entry>> yValues;
     private DataExperiment experimentDetails;
+    private RecyclerView recyclerView;
     private Context context;
 
     String LOG_TAG= this.getClass().getSimpleName();
@@ -45,7 +45,7 @@ public class PlotGraphAdapter extends RecyclerView.Adapter<PlotGraphAdapter.View
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView title;
         LineChart lineChart;
-        ImageView overflowMenu;
+        ImageView saveGraph;
         RelativeLayout lineChartLayout;
 
         public ViewHolder(View v) {
@@ -53,16 +53,18 @@ public class PlotGraphAdapter extends RecyclerView.Adapter<PlotGraphAdapter.View
             title = (TextView) v.findViewById(R.id.tvGraphTitle);
             lineChart = (LineChart) v.findViewById(R.id.lcPlotGraph);
             lineChartLayout = (RelativeLayout) v.findViewById(R.id.rlLineChartLayout);
-            overflowMenu = (ImageView) v.findViewById(R.id.ivOverflowMenu);
+            saveGraph = (ImageView) v.findViewById(R.id.ivSaveGraph);
         }
     }
 
     public PlotGraphAdapter(ArrayList<ArrayList<Entry>> yValues, ArrayList<ArrayList<String>> xValues,
-                            ArrayList<Pair<String,String>> graphList, DataExperiment experimentDetails, Context context){
+                            ArrayList<Pair<String,String>> graphList, DataExperiment experimentDetails,
+                            RecyclerView recyclerView, Context context){
         this.yValues = yValues;
         this.xValues = xValues;
         this.graphList = graphList;
         this.experimentDetails = experimentDetails;
+        this.recyclerView = recyclerView;
         this.context= context;
     }
 
@@ -75,31 +77,30 @@ public class PlotGraphAdapter extends RecyclerView.Adapter<PlotGraphAdapter.View
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
+        Log.d(LOG_TAG, "Position : " + position);
         holder.title.setText(graphList.get(position).first + " vs " + graphList.get(position).second);
 
-        holder.overflowMenu.setOnClickListener(new View.OnClickListener() {
+        holder.saveGraph.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PopupMenu overflowPopup = new PopupMenu(context, holder.overflowMenu);
-                overflowPopup.getMenuInflater().inflate(R.menu.popup_plot_graph_element, overflowPopup.getMenu());
+                boolean status = Util.saveImage(holder.lineChartLayout, experimentDetails.title,
+                        graphList.get(position).first + " vs " + graphList.get(position).second, context);;
 
-                overflowPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        if(menuItem.getItemId() == R.id.popup_save_graph){
-                            saveImage(holder.lineChartLayout, position);
-                        }
-                        return false;
-                    }
-                });
-                overflowPopup.show();
+                if(status){
+                    showToast("Graph saved to " + context.getString(R.string.app_name) + File.separator +
+                    experimentDetails.title.replace(" ","") + File.separator +
+                    graphList.get(position).first + "vs" + graphList.get(position).second + ".jpg");
+                }
+                else {
+                    showToast("Unable to save Graph.");
+                }
             }
         });
 
         // create a dataset and give it a type
-        LineDataSet set = new LineDataSet(yValues.get(position), "DataSet " + position);
+        LineDataSet set = new LineDataSet(yValues.get(position), graphList.get(position).first
+                + " vs " + graphList.get(position).second);
         set.setFillAlpha(110);
-
         set.setColor(Color.BLACK);
         set.setCircleColor(Color.BLACK);
         set.setLineWidth(1f);
@@ -137,59 +138,5 @@ public class PlotGraphAdapter extends RecyclerView.Adapter<PlotGraphAdapter.View
 
     private void showToast(String message){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-    }
-
-    private void saveImage(View view, int position){
-        if(!createFolder()){
-            showToast("Unable to save Graph. Storage permission error.");
-            return;
-        }
-
-        String imagePath = Environment.getExternalStorageDirectory().toString() + File.separator +
-                context.getString(R.string.app_name) +  File.separator + experimentDetails.title.replace(" ", "") +
-                File.separator + graphList.get(position).first.replace(" ","") + "vs" +
-                graphList.get(position).second.replace(" ","") + ".jpg";
-
-        //Create bitmap image path.
-        view.setDrawingCacheEnabled(true);
-        Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
-        view.setDrawingCacheEnabled(false);
-
-        OutputStream fout = null;
-        File imageFile = new File(imagePath);
-
-        try {
-            fout = new FileOutputStream(imageFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90,  fout);
-            fout.flush();
-            fout.close();
-            Log.d(LOG_TAG, "Path : " + imagePath);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            Log.d(LOG_TAG, "Exception in saving image.");
-        }
-
-    }
-
-    //Checks & Creates Folder for saving Files for this experiment.
-    private boolean createFolder(){
-        File folder = new File(Environment.getExternalStorageDirectory().toString() + "/" + context.getString(R.string.app_name));
-
-        boolean folderCreated = true;
-        if(!folder.exists()){
-            folderCreated = folder.mkdir();
-        }
-
-        if(!folderCreated)
-            return false;
-
-        File innerFolder = new File(Environment.getExternalStorageDirectory().toString() + File.separator +
-                context.getString(R.string.app_name) +  File.separator + experimentDetails.title.replace(" ", ""));
-
-        if(!innerFolder.exists()){
-            folderCreated = innerFolder.mkdir();
-        }
-        return folderCreated;
     }
 }

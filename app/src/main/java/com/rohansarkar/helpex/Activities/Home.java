@@ -1,22 +1,28 @@
 package com.rohansarkar.helpex.Activities;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,31 +33,46 @@ import android.widget.Toast;
 import com.rohansarkar.helpex.Adapters.HomeAdapter;
 import com.rohansarkar.helpex.Adapters.NewColumnAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
-import com.rohansarkar.helpex.DatabaseManagers.DatabaseEperimentManager;
+import com.rohansarkar.helpex.CustomData.DataRecord;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseExperimentManager;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseRecordsManager;
 import com.rohansarkar.helpex.R;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import Assets.Util;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
 
 
 public class Home extends AppCompatActivity implements View.OnClickListener{
 
-    RecyclerView recyclerView;
-    RecyclerView.Adapter adapter;
-    RecyclerView.LayoutManager layoutManager;
-    CoordinatorLayout layout;
-    Toolbar toolbar;
-    ImageView overflowMenu;
-    ImageView favourites;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private CoordinatorLayout layout;
+    private Toolbar toolbar;
+    private ImageView overflowMenu;
+    private ImageView favourites;
 
-    ArrayList<DataExperiment> experiments;
-    ArrayList<DataExperiment> favouriteExperiments;
-    DatabaseEperimentManager detailsManager;
+    private ArrayList<DataExperiment> experiments;
+    private ArrayList<DataExperiment> favouriteExperiments;
+    private DatabaseExperimentManager detailsManager;
+    private DatabaseRecordsManager recordsManager;
     boolean isFavourite;
+
+    private String LOG_TAG = getClass().getSimpleName();
+    private int IMPORT_FROM_CSV = 343;
+    private int IMPORT_FROM_EXCEL = 534;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,19 +82,14 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
         init();
         setRecyclerView(experiments);
         setToolbar();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        detailsManager.close();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        detailsManager.open();
         getData();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        detailsManager.close();
+        recordsManager.close();
     }
 
     private void getData(){
@@ -94,12 +110,16 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
 
         experiments= new ArrayList<>();
         favouriteExperiments = new ArrayList<>();
-        detailsManager = new DatabaseEperimentManager(this);
         isFavourite = false;
+
+        detailsManager = new DatabaseExperimentManager(this);
+        recordsManager = new DatabaseRecordsManager(this);
+        detailsManager.open();
+        recordsManager.open();
     }
 
     private void setRecyclerView(ArrayList<DataExperiment> dataExperiments){
-        adapter = new HomeAdapter(dataExperiments, this, layout, recyclerView, detailsManager, isFavourite);
+        adapter = new HomeAdapter(dataExperiments, this, layout, recyclerView, detailsManager, recordsManager, isFavourite);
         recyclerView.setAdapter(adapter);
     }
 
@@ -125,12 +145,20 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
             case R.id.ivOverflowMenu:
                 //Inflate and Show Toolbar popup.
                 PopupMenu toolbarMenu = new PopupMenu(this, overflowMenu);
-                toolbarMenu.getMenuInflater().inflate(R.menu.popup_home_toolbar, toolbarMenu.getMenu());
+                toolbarMenu.getMenuInflater().inflate(R.menu.popup_home, toolbarMenu.getMenu());
                 toolbarMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-                        if(menuItem.getItemId() == R.id.popup_add_experiment){
+                        if (menuItem.getItemId() == R.id.popup_add_experiment){
                             launchNewExperimentDialog();
+                        }
+                        else if (menuItem.getItemId() == R.id.popup_import_data){
+                            if (Util.isExplorerPresent(overflowMenu.getContext())){
+                                showImportOptions();
+                            }
+                            else {
+                                showToast("No file explorer detected. \nPlease install a file explorer to import data.");
+                            }
                         }
                         return false;
                     }
@@ -235,7 +263,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
             }
         });
 
-        //Buttons here.
+        //Add listeners here.
         createNewColumns.setOnClickListener(createNewExperimentListener);
         back.setOnClickListener(backListener);
         dialog.show();
@@ -266,7 +294,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
         final EditText columnName = (EditText) dialog.findViewById(R.id.etColumnName);
         final RelativeLayout dialogLayout= (RelativeLayout) dialog.findViewById(R.id.rlNewColumn);
         Button addColumn = (Button) dialog.findViewById(R.id.bAddColumn);
-        Button createNewExperiment= (Button) dialog.findViewById(R.id.bNewExperiment);
+        final Button creatNewExperiment = (Button) dialog.findViewById(R.id.bNewExperiment);
+        final Button createNewExperiment= (Button) dialog.findViewById(R.id.bNewExperiment);
         ImageView back = (ImageView) dialog.findViewById(R.id.ivBack);
 
         final RecyclerView dialogRecylerView= (RecyclerView) dialog.findViewById(R.id.rvNewExperiment);
@@ -291,22 +320,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
             @Override
             public void onClick(View view) {
                 if(title.trim().length()>0){
-                    DataExperiment data = new DataExperiment();
-                    data.title = title;
-                    data.starType = Util.StarType.NOT_STARRED;
-                    data.date = "12/03/2017";
-                    data.time = "12:07 PM";
-
-                    if(subject.trim().length()>0)
-                        data.subject = subject;
-                    else
-                        data.subject = "";
-
-                    data.experimentID = detailsManager.createEntry(data);
-
-                    experiments.add(data);
-                    setRecyclerView(experiments);
-
+                    createNewExperiment(title, subject, null);
                     dialog.dismiss();
                 }
             }
@@ -324,6 +338,184 @@ public class Home extends AppCompatActivity implements View.OnClickListener{
         createNewExperiment.setOnClickListener(createNewExperimentListener);
         back.setOnClickListener(backListener);
         dialog.show();
+    }
+
+    //Get file for import.
+    private void getFile(int importOptions){
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("text/plain");
+        startActivityForResult(intent, importOptions);
+    }
+
+    //Import Data from Excel File.
+    private void importDataFromExcel(Uri xlsPath){
+        if(!xlsPath.getPath().contains(".xls")){
+            //Wrong File type.
+            showToast("Error in reading file. \nPlease make sure you are importing .xls file only.");
+        }
+
+        try{
+            String root = Environment.getExternalStorageDirectory().toString();
+            String fileName = xlsPath.getLastPathSegment().split(".xls")[0];
+
+            ArrayList<String> columnList = new ArrayList<>();
+            ArrayList<ArrayList<String>> tableData = new ArrayList<>();
+            File inputFile = new File(xlsPath.getPath());
+            Workbook workbook = Workbook.getWorkbook(inputFile);
+            showToast("Importing data from " + xlsPath.getLastPathSegment());
+
+            //Should make it dynamic.
+            Sheet sheet = workbook.getSheet(0);
+
+            for (int j=0; j<sheet.getColumns(); j++){
+                columnList.add(sheet.getCell(j,0).getContents());
+            }
+
+            for (int i=0;  i<sheet.getRows(); i++){
+                ArrayList<String> rowData = new ArrayList<>();
+                for (int j=0; j<sheet.getColumns(); j++){
+                    Cell cell = sheet.getCell(j,i);
+                    rowData.add(cell.getContents());
+                }
+
+                //Verify Column Structure in .xls file
+                if(columnList.size() >= rowData.size()){
+                    tableData.add(rowData);
+                }
+                else {
+                    Log.d(LOG_TAG, "Row No : " + i + ",  columnList.size : " + columnList.size() +
+                            ", rowData.size : " + rowData.size());
+                    showToast("Data in " + xlsPath.getLastPathSegment() + " is not properly organised.");
+                    return;
+                }
+            }
+
+            //Create Experiment.
+            createNewExperiment(fileName, "", Util.getString(columnList, "~"));
+            saveTableData(tableData, experiments.get(experiments.size()-1));
+            showToast("Successfully imported " + xlsPath.getLastPathSegment());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            showToast("Error in reading file. \nPlease make sure you are importing .xls file only.");
+        }
+    }
+
+    //Import Data from CSV File.
+    private void importDataFromCSV(Uri csvPath){
+        if(!csvPath.getPath().contains(".csv")){
+            //Wrong File type.
+            showToast("Error in reading file. \nPlease make sure you are importing .csv file only.");
+        }
+
+        InputStream inputStream = null;
+        try{
+            String root = Environment.getExternalStorageDirectory().toString();
+            String fileName = csvPath.getLastPathSegment().split(".csv")[0];
+
+            ArrayList<String> columnList = new ArrayList<>();
+            ArrayList<ArrayList<String>> tableData = new ArrayList<>();
+            inputStream = new FileInputStream(csvPath.getPath());
+            BufferedReader csvReader = new BufferedReader(new InputStreamReader(inputStream));
+            showToast("Importing data from " + csvPath.getLastPathSegment());
+
+            String csvLine;
+            //Get column list
+            if((csvLine = csvReader.readLine()) != null){
+                columnList = Util.splitString(csvLine, ",");
+            }
+
+            //get Table Data
+            while ((csvLine = csvReader.readLine()) != null){
+                tableData.add(Util.splitString(csvLine, ","));
+
+                //Verify column structure in .csv file
+                if(columnList.size() != tableData.get(tableData.size()-1).size()){
+                    showToast("Data in " + csvPath.getLastPathSegment() + " is not properly organised.");
+                    return;
+                }
+            }
+
+            //Create Experiment.
+            createNewExperiment(fileName, "", Util.getString(columnList, "~"));
+            saveTableData(tableData, experiments.get(experiments.size() - 1));
+            inputStream.close();
+            showToast("Successfully imported " + csvPath.getLastPathSegment());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            showToast("Error in reading file. \nPlease make sure you are importing .csv file only.");
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            if(requestCode == IMPORT_FROM_EXCEL){
+                importDataFromExcel(data.getData());
+            }
+            else if (requestCode == IMPORT_FROM_CSV){
+                importDataFromCSV(data.getData());
+            }
+        }
+    }
+
+    private void createNewExperiment(String title, String subject, String columnString){
+        DataExperiment data = new DataExperiment();
+        data.title = title;
+        data.starType = Util.StarType.NOT_STARRED;
+        data.date = "12/03/2017";
+        data.time = "12:07 PM";
+        data.subject = subject;
+
+        if(columnString != null)
+            data.columnNames = columnString;
+
+        data.experimentID = detailsManager.createEntry(data);
+
+        experiments.add(data);
+        adapter.notifyItemInserted(experiments.size()-1);
+        recyclerView.smoothScrollToPosition(experiments.size()-1);
+    }
+
+    private void showImportOptions(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(R.drawable.icon_export_grey);
+        builder.setTitle("Import from : ");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
+        adapter.add("Excel File (.xls)");
+        adapter.add("CSV File (.csv)");
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switch (i){
+                    case 0:
+                        getFile(IMPORT_FROM_EXCEL);
+                        break;
+                    case 1:
+                        getFile(IMPORT_FROM_CSV);
+                        break;
+                }
+            }
+        });
+        builder.show();
+    }
+
+    private void saveTableData(ArrayList<ArrayList<String>> tableData, DataExperiment experimentDetails){
+        for(int i=0;  i<tableData.size(); i++){
+            recordsManager.createRecord(new DataRecord(experimentDetails.experimentID,
+                    Util.getString(tableData.get(i), "~")));
+        }
     }
 
     private void showToast(String message){

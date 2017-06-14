@@ -3,7 +3,7 @@
     android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
     android:id="@+id/llTableRowNo" android:orientation="horizontal" >
 
-    <Assets.TextViewGrandHotel
+    <Assets.EditTextRobotoLight
         android:layout_width="match_parent" android:layout_height="match_parent"
         android:textColor="#eeeeee" android:paddingLeft="8sp"
         android:id="@+id/tvTableRowNo" android:gravity="center_vertical"

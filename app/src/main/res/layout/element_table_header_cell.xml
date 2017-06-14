@@ -13,9 +13,9 @@
         android:id="@+id/ivDividerLeft" android:layout_alignParentLeft="true"
         android:background="@color/custom_table_header_divider"/>
 
-    <Assets.TextViewGrandHotel
+    <Assets.TextViewRobotoLight
         android:layout_width="match_parent" android:layout_height="match_parent"
         android:id="@+id/tvTableHeader" android:textColor="#eeeeee"
-        android:textSize="32sp" android:gravity="center"/>
+        android:textSize="26sp" android:gravity="center"/>
 
 </RelativeLayout>

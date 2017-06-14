@@ -40,7 +40,6 @@ import android.widget.Toast;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Font.FontFamily;
@@ -52,7 +51,6 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import com.itextpdf.text.pdf.codec.Base64;
 import com.rohansarkar.helpex.Adapters.GraphListAdapter;
 import com.rohansarkar.helpex.Adapters.GraphSelectAdapter;
 import com.rohansarkar.helpex.Adapters.NewColumnAdapter;
@@ -62,20 +60,15 @@ import com.rohansarkar.helpex.Adapters.TableRowNoAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
 import com.rohansarkar.helpex.CustomData.DataRecord;
 import com.rohansarkar.helpex.CustomData.DataSelectColumn;
-import com.rohansarkar.helpex.DatabaseManagers.DatabaseEperimentManager;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseExperimentManager;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseRecordsManager;
 import com.rohansarkar.helpex.R;
 
-import org.xml.sax.DocumentHandler;
-
-import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DecimalFormat;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -108,7 +101,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     RelativeLayout tableLayout;   //If NumberOfColumns > 0
     ViewGroup headerViewGroup;
 
-    DatabaseEperimentManager detailsManager;
+    DatabaseExperimentManager detailsManager;
     DatabaseRecordsManager recordsManager;
     DataExperiment experimentDetails;            //Data about Experiment selected.
     ArrayList<String> columnList;               //Contains Column List.
@@ -206,7 +199,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         emptyLayout.setOnClickListener(this);
         addRow.setOnClickListener(this);
 
-        detailsManager = new DatabaseEperimentManager(this);
+        detailsManager = new DatabaseExperimentManager(this);
         detailsManager.open();
         recordsManager = new DatabaseRecordsManager(this);
         recordsManager.open();
@@ -397,8 +390,9 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     private void setPlotGraphRecyclerView(RecyclerView dialogRecyclelrView, RecyclerView.Adapter dialogAdapter,
                                  ArrayList<Pair<String, String>> graphList, RecyclerView.Adapter graphAdapter,
                                  ArrayList<DataSelectColumn> columnNames, LinearLayout graphRecyclerViewLayout,
-                                 TextView emptyLayout, TextView hint){
-        dialogAdapter = new GraphSelectAdapter(columnNames, graphList, graphAdapter, graphRecyclerViewLayout, emptyLayout, hint, this);
+                                 RecyclerView graphRecyclerView, TextView emptyLayout, TextView hint){
+        dialogAdapter = new GraphSelectAdapter(columnNames, graphList, graphAdapter, graphRecyclerViewLayout,
+                graphRecyclerView, emptyLayout, hint, this);
         dialogRecyclelrView.setAdapter(dialogAdapter);
     }
 
@@ -442,7 +436,7 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         columnRecyclerView.setLayoutManager(columnLayoutManager);
         final RecyclerView.Adapter columnAdapter = null;
         setPlotGraphRecyclerView(columnRecyclerView, columnAdapter, graphList, graphAdapter, columnName,
-                graphRecyclerViewLayout, emptyLayout, hint);
+                graphRecyclerViewLayout, graphRecyclerView, emptyLayout, hint);
 
         //Button Listener here.
         View.OnClickListener doneListener= new View.OnClickListener() {
@@ -780,6 +774,50 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    //Creates CSV File & Save Data.
+    private void exportTableAsCsv(){
+        if(!createFolder()){
+            showToast("Unable to export CSV file. Storage permission error.");
+            return;
+        }
+
+        File fileDirectory = new File(Environment.getExternalStorageDirectory().toString() + File.separator +
+                getString(R.string.app_name) +  File.separator + experimentDetails.title.replace(" ", ""));
+
+        try {
+            File csvFile = new File(fileDirectory, experimentDetails.title.replace(" ","") + ".csv");
+            FileWriter csvWriter = new FileWriter(csvFile);
+            BufferedWriter csvBuffer = new BufferedWriter(csvWriter);
+
+            //Write column names.
+            csvBuffer.write(columnList.get(0));
+            for(int i=1; i<columnList.size(); i++){
+                csvBuffer.write("," + columnList.get(i));
+            }
+            csvBuffer.newLine();
+
+            for(int i=0; i<tableData.size(); i++){
+                //Add non-empty rows only.
+                if(!Util.isEmptyRow(experimentRecords.get(i).record)) {
+                    csvBuffer.write(tableData.get(i).get(0));
+                    for (int j = 1; j < columnList.size(); j++) {
+                        csvBuffer.write("," + tableData.get(i).get(j));
+                    }
+                    csvBuffer.newLine();
+                }
+            }
+
+            //Flush data.
+            csvBuffer.flush();
+            showToast("Data successfully exported to "  + getString(R.string.app_name) + File.separator +
+                    experimentDetails.title.replace(" ","") + File.separator + experimentDetails.title.replace(" ","") + ".csv");
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            showToast("Unable to export CSV file.");
+        }
+    }
+
     //Checks & Creates Folder for saving Files for this experiment.
     private boolean createFolder(){
         File folder = new File(Environment.getExternalStorageDirectory().toString() + "/" + getString(R.string.app_name));
@@ -804,8 +842,8 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
     //Displays Export Options
     private void showExportOptions(){
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setIcon(R.drawable.icon_more_vert);
-        builder.setTitle("Export as : ");
+        builder.setIcon(R.drawable.icon_export_grey);
+        builder.setTitle("Export Table as : ");
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
         adapter.add("PDF");
@@ -830,36 +868,11 @@ public class ExperimentTable extends AppCompatActivity implements View.OnClickLi
                         exportTableAsExcel();
                         break;
                     case 2:
+                        exportTableAsCsv();
                         break;
                 }
             }
         });
         builder.show();
-    }
-
-    //EVENT Class.
-    public static class Event {
-
-        private final int x;
-        private final int y;
-        private final HorizontalScrollView view;
-
-        public Event(HorizontalScrollView view, int x, int y) {
-            this.x = x;
-            this.y = y;
-            this.view = view;
-        }
-
-        public int getX() {
-            return x;
-        }
-
-        public int getY() {
-            return y;
-        }
-
-        public HorizontalScrollView getView() {
-            return view;
-        }
     }
 }

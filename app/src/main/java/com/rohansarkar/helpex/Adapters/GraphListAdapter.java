@@ -60,8 +60,8 @@ public class GraphListAdapter extends RecyclerView.Adapter<GraphListAdapter.View
         holder.cross.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                notifyItemRemoved(position);
                 graphList.remove(position);
-                notifyDataSetChanged();
 
                 if(graphList.size() <= 0){
                     recyclerViewLayout.setVisibility(View.GONE);

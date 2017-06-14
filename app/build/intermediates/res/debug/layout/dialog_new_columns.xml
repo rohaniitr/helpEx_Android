@@ -14,11 +14,12 @@
             android:id="@+id/ivBack" android:background="@drawable/abc_ic_ab_back_mtrl_am_alpha"
             android:tint="#eeeeee" android:layout_centerVertical="true"/>
 
-        <Assets.TextViewGrandHotel
+        <Assets.TextViewRobotoLight
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="Create New Experiment" android:textColor="#dddddd"
-            android:textSize="32sp" android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/ivBack" android:layout_marginLeft="16sp"/>
+            android:textSize="26sp" android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/ivBack" android:layout_marginLeft="16sp"
+            android:singleLine="true" android:ellipsize="end"/>
 
     </RelativeLayout>
 

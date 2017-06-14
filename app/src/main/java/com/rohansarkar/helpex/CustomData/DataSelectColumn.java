@@ -5,19 +5,19 @@ package com.rohansarkar.helpex.CustomData;
  */
 public class DataSelectColumn {
     public boolean isSelected;
-    public String columnName;
+    public String text;
 
     public DataSelectColumn(){
         isSelected = false;
-        columnName = "";
+        text = "";
     }
-    public DataSelectColumn(String columnName){
+    public DataSelectColumn(String text){
         isSelected = false;
-        this.columnName = columnName;
+        this.text = text;
     }
-    public DataSelectColumn(String columnName, boolean isSelected){
+    public DataSelectColumn(String text, boolean isSelected){
         this.isSelected = isSelected;
-        this.columnName = columnName;
+        this.text = text;
     }
 
 

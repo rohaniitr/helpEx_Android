@@ -24,6 +24,7 @@ public class GraphSelectAdapter extends RecyclerView.Adapter<GraphSelectAdapter.
     private ArrayList<Pair<String,String>> graphList;
     private RecyclerView.Adapter graphListAdapter;
     private LinearLayout graphRecyclerViewLayout;
+    private RecyclerView graphListRecyclerView;
     private TextView emptyLayout, hint;
     private Context context;
     //Position of columns for X & Y axis.
@@ -45,12 +46,13 @@ public class GraphSelectAdapter extends RecyclerView.Adapter<GraphSelectAdapter.
 
     public GraphSelectAdapter(ArrayList<DataSelectColumn> columnNames, ArrayList<Pair<String,String>> graphList,
                               RecyclerView.Adapter graphListAdapter, LinearLayout graphRecyclerViewLayout,
-                              TextView emptyLayout,TextView hint, Context context){
+                              RecyclerView graphListRecyclerView, TextView emptyLayout, TextView hint, Context context){
         this.columnNames = columnNames;
         this.graphList = graphList;
         this.graphListAdapter = graphListAdapter;
         this.graphRecyclerViewLayout = graphRecyclerViewLayout;
         this.emptyLayout = emptyLayout;
+        this.graphListRecyclerView = graphListRecyclerView;
         this.hint = hint;
         this.context= context;
         xPos = -1;
@@ -66,7 +68,7 @@ public class GraphSelectAdapter extends RecyclerView.Adapter<GraphSelectAdapter.
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.columnName.setText(columnNames.get(position).columnName);
+        holder.columnName.setText(columnNames.get(position).text);
 
         if(columnNames.get(position).isSelected){
             holder.tick.setVisibility(View.VISIBLE);
@@ -83,15 +85,24 @@ public class GraphSelectAdapter extends RecyclerView.Adapter<GraphSelectAdapter.
                 if(xPos == -1){
                     //First element added. (X-axis)
                     xPos = position;
-                    hint.setText("X-axis: " + columnNames.get(position).columnName +
+                    hint.setText("X-axis: " + columnNames.get(position).text +
                             context.getResources().getString(R.string.plot_graph_hint_2));
                 }
                 else if(xPos != position){
                     //Second element added. (Y-axis)
                     //Add Graph detail to graphList & Update UI.
-                    graphList.add(new Pair<String, String>(columnNames.get(xPos).columnName, columnNames.get(position).columnName));
-                    graphListAdapter.notifyItemInserted(columnNames.size()-1);
-                    showToast("Added : " + graphList.get(graphList.size()-1).first + " vs " + graphList.get(graphList.size()-1).second);
+                    Pair<String,String> pair = new Pair<String, String>(columnNames.get(xPos).text, columnNames.get(position).text);
+                    if(graphList.contains(pair)){
+                        int index = graphList.indexOf(pair);
+                        graphListRecyclerView.smoothScrollToPosition(index);
+                        showToast("Graph is already present in the list.");
+                    }
+                    else {
+                        graphList.add(pair);
+                        graphListAdapter.notifyItemInserted(graphList.size() - 1);
+                        graphListRecyclerView.smoothScrollToPosition(graphList.size()-1);
+                    }
+
                     //Assign Normal state to recyclerView elements.
                     hint.setText(context.getResources().getString(R.string.plot_graph_hint_1));
                     columnNames.get(xPos).isSelected = false;

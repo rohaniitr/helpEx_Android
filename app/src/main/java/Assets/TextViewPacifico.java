@@ -8,7 +8,7 @@ import android.widget.TextView;
 /**
  * Created by rohan on 14/3/17.
  */
-public class TextViewPacifico  extends TextView {
+public class TextViewPacifico extends TextView {
 
     public TextViewPacifico(Context context, AttributeSet attrs) {
         super(context, attrs);

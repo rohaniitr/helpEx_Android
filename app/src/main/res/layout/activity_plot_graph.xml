@@ -12,9 +12,10 @@
         android:elevation="20sp">
 
         <RelativeLayout
-            android:layout_width="match_parent" android:layout_height="match_parent">
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:paddingRight="16sp">
 
-            <Assets.TextViewGrandHotel
+            <Assets.TextViewRobotoLight
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:id="@+id/tvToolbarTitle" android:layout_centerVertical="true"
                 android:textColor="#dddddd" android:textSize="32sp"

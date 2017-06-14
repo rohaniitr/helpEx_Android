@@ -12,12 +12,10 @@ import com.rohansarkar.helpex.CustomData.DataExperiment;
 
 import java.util.ArrayList;
 
-import Assets.Util;
-
 /**
  * Created by rohan on 16/3/17.
  */
-public class DatabaseEperimentManager {
+public class DatabaseExperimentManager {
 
     String LOG_TAG= "DatabaseManager Logs";
     public static final String KEY_EXPERIMENT_ID = "experiment_id";
@@ -62,10 +60,10 @@ public class DatabaseEperimentManager {
         }
     }
 
-    public DatabaseEperimentManager(Context c){
+    public DatabaseExperimentManager(Context c){
         ourContext = c;
     }
-    public DatabaseEperimentManager open() throws SQLException {
+    public DatabaseExperimentManager open() throws SQLException {
 
         ourHelper = new DbHelper(ourContext);
         ourDatabase = ourHelper.getWritableDatabase();

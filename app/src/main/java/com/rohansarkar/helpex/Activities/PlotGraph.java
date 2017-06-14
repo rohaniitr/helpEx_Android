@@ -1,6 +1,7 @@
 package com.rohansarkar.helpex.Activities;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -21,17 +22,24 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.data.Entry;
+import com.rohansarkar.helpex.Adapters.GraphListAdapter;
+import com.rohansarkar.helpex.Adapters.GraphSelectAdapter;
 import com.rohansarkar.helpex.Adapters.PlotGraphAdapter;
 import com.rohansarkar.helpex.CustomData.DataExperiment;
 import com.rohansarkar.helpex.CustomData.DataGraph;
 import com.rohansarkar.helpex.CustomData.DataRecord;
-import com.rohansarkar.helpex.DatabaseManagers.DatabaseEperimentManager;
+import com.rohansarkar.helpex.CustomData.DataSelectColumn;
+import com.rohansarkar.helpex.DatabaseManagers.DatabaseExperimentManager;
 import com.rohansarkar.helpex.DatabaseManagers.DatabaseRecordsManager;
 import com.rohansarkar.helpex.R;
 
@@ -55,7 +63,7 @@ public class PlotGraph extends AppCompatActivity implements View.OnClickListener
     ImageView overflowMenu;
 
     private DatabaseRecordsManager recordsManager;
-    private DatabaseEperimentManager detailsManager;
+    private DatabaseExperimentManager detailsManager;
 
     private ArrayList<ArrayList<String>> tableData;
     private ArrayList<Pair<String,String>> graphList;
@@ -168,7 +176,7 @@ public class PlotGraph extends AppCompatActivity implements View.OnClickListener
         columnList = new ArrayList<>();
         tableData = new ArrayList<>();
 
-        detailsManager = new DatabaseEperimentManager(this);
+        detailsManager = new DatabaseExperimentManager(this);
         recordsManager = new DatabaseRecordsManager(this);
         detailsManager.open();
         recordsManager.open();
@@ -176,7 +184,7 @@ public class PlotGraph extends AppCompatActivity implements View.OnClickListener
 
     private void setRecyclerView(ArrayList<ArrayList<Entry>> yValues, ArrayList<ArrayList<String>> xValues,
                                  ArrayList<Pair<String,String>> graphList){
-        adapter = new PlotGraphAdapter(yValues, xValues, graphList, experimentDetails, this);
+        adapter = new PlotGraphAdapter(yValues, xValues, graphList, experimentDetails, recyclerView, this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -192,6 +200,90 @@ public class PlotGraph extends AppCompatActivity implements View.OnClickListener
 
         toolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
         toolbarTitle.setText(experimentDetails.title);
+    }
+
+    private void saveData(){
+        Log.d(LOG_TAG, "Started Saving. . .");
+        recyclerView.smoothScrollToPosition(graphList.size()-1);
+    }
+
+    private void launchRedrawGraphDialog(){
+        final Dialog dialog= new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_graph_column);
+
+        WindowManager.LayoutParams lp= new WindowManager.LayoutParams();
+        Window window= dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+        lp.width= WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height= WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(lp);
+
+        //Add Array for horizontal Recycler View
+        ArrayList<DataSelectColumn> columnName = new ArrayList<>();
+        for (int i=0; i<columnList.size(); i++){
+            columnName.add(new DataSelectColumn(columnList.get(i)));
+        }
+        Log.d(LOG_TAG, "columnList : " + columnList.size() + ", columnName: " + columnName.size());
+
+        Button done = (Button) dialog.findViewById(R.id.bDone);
+        ImageView back = (ImageView) dialog.findViewById(R.id.ivBack);
+        TextView emptyLayout = (TextView) dialog.findViewById(R.id.tvEmptyLayout);
+        LinearLayout graphRecyclerViewLayout = (LinearLayout) dialog.findViewById(R.id.llGraphRecyclerView);
+        TextView hint = (TextView) dialog.findViewById(R.id.tvHint);
+        emptyLayout.setVisibility(View.GONE);
+
+        //For displaying list of Graphs that'll be plotted.
+        final RecyclerView graphRecyclerView = (RecyclerView) dialog.findViewById(R.id.rvGraphList);
+        LinearLayoutManager graphLayoutManager = new LinearLayoutManager(this);
+        graphRecyclerView.setLayoutManager(graphLayoutManager);
+        final RecyclerView.Adapter graphAdapter = new GraphListAdapter(graphList, graphRecyclerViewLayout, emptyLayout,
+                this);
+        graphRecyclerView.setAdapter(graphAdapter);
+
+        //For adding columns to Graph list.
+        final RecyclerView columnRecyclerView = (RecyclerView) dialog.findViewById(R.id.rvGraphColumn);
+        LinearLayoutManager columnLayoutManager = new LinearLayoutManager(this);
+        columnRecyclerView.setLayoutManager(columnLayoutManager);
+        final RecyclerView.Adapter columnAdapter = new GraphSelectAdapter(columnName, graphList, graphAdapter,
+                graphRecyclerViewLayout, graphRecyclerView, emptyLayout, hint, this);
+        columnRecyclerView.setAdapter(columnAdapter);
+
+        //Button Listener here.
+        View.OnClickListener doneListener= new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(graphList.size() > 0){
+                    structureGraphData();
+                    setRecyclerView(yValues, xValues, graphList);
+                    dialog.dismiss();
+                }
+                else {
+                    showToast("No Graphs to be plotted.");
+                    dialog.dismiss();
+                    finish();
+                }
+            }
+        };
+        View.OnClickListener backListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        };
+
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                Util.hideKeyboard(dialog.getContext(), recyclerView);
+            }
+        });
+
+        //Add listeners here.
+        done.setOnClickListener(doneListener);
+        back.setOnClickListener(backListener);
+        dialog.show();
+        Util.hideKeyboard(dialog.getContext(), recyclerView);
     }
 
     //Permission UX.
@@ -269,14 +361,8 @@ public class PlotGraph extends AppCompatActivity implements View.OnClickListener
                 toolbarMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-                        if(menuItem.getItemId() == R.id.popup_export){
-                            showToast("Export");
-                        }
-                        else if(menuItem.getItemId() == R.id.popup_redraw_graphs){
-                            showToast("Redraw");
-                        }
-                        else if(menuItem.getItemId() == R.id.popup_save_graphs){
-                            showToast("Save Graphs");
+                        if(menuItem.getItemId() == R.id.popup_redraw_graphs){
+                            launchRedrawGraphDialog();
                         }
                         return false;
                     }

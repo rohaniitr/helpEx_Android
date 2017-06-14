@@ -115,4 +115,9 @@ public class DatabaseRecordsManager {
         ourDatabase.delete(TABLE_EXPERIMENT_RECORDS, KEY_RECORD_ID + "=" + recordId, null);
         Log.d(LOG_TAG, "Deleted : " + recordId);
     }
+
+    public void deleteExperimentRecords(long experimentID){
+        ourDatabase.delete(TABLE_EXPERIMENT_RECORDS, KEY_EXPERIMENT_ID + "=" + experimentID, null);
+        Log.d(LOG_TAG, "Deleted records dor experiment : " + experimentID);
+    }
 }
